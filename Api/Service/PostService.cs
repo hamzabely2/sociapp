@@ -1,9 +1,7 @@
-﻿using Api.Model;
+﻿using Api.Entity;
 using Api.Service;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using System.Runtime.InteropServices;
 
 namespace Api.Services
 {
@@ -25,7 +23,7 @@ namespace Api.Services
         private readonly Context _context;
         private readonly IConfiguration _configuration;
 
-        public PostService( Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public PostService(Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             _context = context;
             _connectionService = connectionService;
@@ -43,7 +41,7 @@ namespace Api.Services
         /// sauf si les utlise est en mod eprive ne montre pas ses postes
         public async Task<List<Post>> GetAllPostsAsync()
         {
-            var posts = await _context.Post.ToListAsync();
+            var posts = await _context.Posts.ToListAsync();
             // Pour chaque publication
             foreach (var post in posts)
             {
@@ -64,7 +62,7 @@ namespace Api.Services
         ///  sauf si les utlise est en mod eprive ne montre pas ses postes
         public async Task<Post> GetPostByIdAsync(int postId)
         {
-            Post post = await _context.Post.FindAsync(postId);
+            Post post = await _context.Posts.FindAsync(postId);
 
             if (post != null)
             {
@@ -75,7 +73,6 @@ namespace Api.Services
                 throw new ArgumentException("L'action a échoué");
             }
         }
-
 
         /// <summary>
         /// create post by users
@@ -107,10 +104,10 @@ namespace Api.Services
                 post.MediaUrl = blobClient.Uri.ToString();
             }
 
-            await _context.Post.AddAsync(post);
+            await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
 
-            Post postCreate = await _context.Post.FindAsync(post.Id);
+            Post postCreate = await _context.Posts.FindAsync(post.Id);
 
             if (postCreate != null)
             {
@@ -121,7 +118,6 @@ namespace Api.Services
                 throw new ArgumentException("L'action a échoué");
             }
         }
-    
 
         /// <summary>
         /// delete post by users
@@ -136,10 +132,10 @@ namespace Api.Services
             // if (userId == 0)
             //    throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");*/
 
-            Post post = await _context.Post.FindAsync(postId);
+            Post post = await _context.Posts.FindAsync(postId);
             if (post != null)
             {
-                _context.Post.Remove(post);
+                _context.Posts.Remove(post);
                 await _context.SaveChangesAsync();
                 return post;
             }

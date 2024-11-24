@@ -15,6 +15,7 @@ builder.Services.AddDbContext<Context>(options =>
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 builder.Services.AddControllers();

@@ -1,8 +1,6 @@
-﻿using Api.Model;
+﻿using Api.Entity;
 using Api.Services;
-using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 
 namespace Api.Controllers
 {

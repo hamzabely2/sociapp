@@ -1,4 +1,4 @@
-﻿using Api.Model;
+﻿using Api.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 
@@ -34,7 +34,7 @@ namespace Api.Service
             // if (userId == 0)
             //    throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");*/
 
-            Post post = await _context.Post.FindAsync(postId);
+            Post post = await _context.Posts.FindAsync(postId);
 
             if (post == null)
             {

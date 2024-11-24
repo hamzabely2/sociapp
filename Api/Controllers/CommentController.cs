@@ -1,4 +1,4 @@
-﻿using Api.Model;
+﻿using Api.Entity;
 using Api.Service;
 using Microsoft.AspNetCore.Mvc;
 
