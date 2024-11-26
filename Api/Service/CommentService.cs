@@ -13,10 +13,12 @@ namespace Api.Service
     public class CommentService : ICommentService
     {
         private readonly Context _context;
+        private readonly IConnectionService _connectionService;
 
-        public CommentService(Context context)
+
+        public CommentService(Context context, IConnectionService connectionService)
         {
-
+            _connectionService = connectionService;
             _context = context;
         }
 
@@ -28,11 +30,9 @@ namespace Api.Service
         public async Task<Comments> CreateCommentsAsync(Comments comment,int postId)
         {
 
-            //var userInfo = _connectionService.GetCurrentUserInfo(_httpContextAccessor);
-            //int userId = userInfo.Id;
-
-            // if (userId == 0)
-            //    throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");*/
+            var userInfo = _connectionService.GetCurrentUserInfo();
+             if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             Post post = await _context.Posts.FindAsync(postId);
 
@@ -44,7 +44,7 @@ namespace Api.Service
             comment.CreateDate = DateTime.Now;
             comment.UpdateDate = DateTime.Now;
             comment.PostId = postId;
-            //comment.UserId = userId;
+            comment.UserId = userInfo.Id;
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
 
@@ -68,13 +68,11 @@ namespace Api.Service
         /// <returns></returns>
         public async Task<Comments> DeleteCommentsAsync(int commentId)
         {
-            //var userInfo = _connectionService.GetCurrentUserInfo(_httpContextAccessor);
-            //int userId = userInfo.Id;
+            var userInfo = _connectionService.GetCurrentUserInfo();
+             if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
-            // if (userId == 0)
-            //    throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");*/
-
-            var comment = await _context.Comments.FindAsync(commentId);
+            Comments comment = await _context.Comments.FindAsync(commentId);
             if (comment != null)
             {
                 _context.Comments.Remove(comment);

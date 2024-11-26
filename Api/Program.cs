@@ -29,7 +29,17 @@ builder.Services.AddHttpContextAccessor();
 var validAudience = builder.Configuration["JWT:ValidAudience"];
 var validIssuer = builder.Configuration["JWT:ValidIssuer"];
 var secret = builder.Configuration["JWT:Secret"];
+var reactApp = builder.Configuration["Cors:url"];
 
+string[] origins = new string[] { reactApp, "http://localhost:3000" };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "ReactLocal",
+      policy => policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod()
+    );
+});
 
 var app = builder.Build();
 //if (app.Environment.IsDevelopment())
@@ -40,8 +50,12 @@ var app = builder.Build();
 
 
 //app.UseHttpsRedirection();
+builder.Services.AddHttpContextAccessor();
 
 app.UseAuthorization();
+app.UseCors("ReactLocal");
+app.UseCookiePolicy();
+app.UseAuthentication();
 
 app.MapControllers();
 

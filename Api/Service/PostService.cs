@@ -38,19 +38,10 @@ namespace Api.Services
         /// get  all post
         /// </summary>
         /// <returns></returns>
-        /// sauf si les utlise est en mod eprive ne montre pas ses postes
+        /// sauf si les utlise est en mode prive ne montre pas ses postes
         public async Task<List<Post>> GetAllPostsAsync()
         {
             var posts = await _context.Posts.ToListAsync();
-            // Pour chaque publication
-            foreach (var post in posts)
-            {
-                if (!string.IsNullOrEmpty(post.MediaUrl))
-                {
-                    post.DownloadUrl = post.MediaUrl;
-                }
-            }
-
             return posts;
         }
 
@@ -81,8 +72,15 @@ namespace Api.Services
         /// <returns></returns>
         public async Task<Post> CreatePostAsync(Post post, IFormFile file)
         {
+            var userInfo = _connectionService.GetCurrentUserInfo();
+            int userId = userInfo.Id;
+
+            if (userId == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
             post.CreateDate = DateTime.Now;
             post.UpdateDate = DateTime.Now;
+            post.UserId = userId;
 
             if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
                  throw new ArgumentException("L'action a échoué: Type de fichier invalide.");
@@ -126,11 +124,11 @@ namespace Api.Services
         /// <returns></returns>
         public async Task<Post> DeletePostAsync(int postId)
         {
-            //var userInfo = _connectionService.GetCurrentUserInfo(_httpContextAccessor);
-            //int userId = userInfo.Id;
+            var userInfo = _connectionService.GetCurrentUserInfo();
+            int userId = userInfo.Id;
 
-            // if (userId == 0)
-            //    throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");*/
+             if (userId == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             Post post = await _context.Posts.FindAsync(postId);
             if (post != null)

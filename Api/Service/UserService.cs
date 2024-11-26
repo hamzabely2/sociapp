@@ -2,8 +2,11 @@
 using Api.Model.DTO;
 using Azure.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.Hosting;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Xml.Linq;
 
 namespace Api.Service
 {
@@ -11,6 +14,9 @@ namespace Api.Service
     {
         Task<string> RegisterAsync(User user);
         Task<string> LoginAsync(LoginUserDTO user);
+        Task<string> FollowUserAsync(int userIdFollowed);
+        Task<string> UpdateUserAsync(bool profilePrivacy);
+        Task<List<User>> GetAllUsersAsync();
     }
     public class UserService : IUserService
     {
@@ -22,11 +28,18 @@ namespace Api.Service
         private readonly Context _context;
         private readonly IConfiguration _configuration;
 
-        public UserService(Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration) {
+        public UserService(Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        {
             _context = context;
             _connectionService = connectionService;
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
+        }
+
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            var users = await _context.Users.ToListAsync();
+            return users;
         }
 
         public async Task<string> RegisterAsync(User user)
@@ -38,6 +51,9 @@ namespace Api.Service
 
             var passwordHash = _connectionService.HashPassword(user.Password);
             user.Password = passwordHash;
+            user.ProfilePrivacy = false;
+            user.UpdateDate  = DateTime.Now;
+            user.CreateDate = DateTime.Now;
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -45,7 +61,7 @@ namespace Api.Service
             var claims = new List<Claim>
             {
             new Claim(ClaimTypes.NameIdentifier, Convert.ToString(user.Id)),
-            new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new Claim(ClaimTypes.Name, $"{user.UserName}"),
             new Claim(ClaimTypes.Email, user.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 
@@ -53,7 +69,7 @@ namespace Api.Service
 
             //create token
             var token = _connectionService.CreateToken(claims);
-            _connectionService.AddTokenCookie(new JwtSecurityTokenHandler().WriteToken(token), _httpContextAccessor);
+            _connectionService.AddTokenCookie(new JwtSecurityTokenHandler().WriteToken(token));
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -61,13 +77,13 @@ namespace Api.Service
         public async Task<string> LoginAsync(LoginUserDTO user)
         {
             User userExiste = await _context.Users.FirstOrDefaultAsync(x => x.Email == user.Email).ConfigureAwait(false);
-            if (userExiste == null  || !_connectionService.VerifyPassword(user.Password, userExiste.Password))
+            if (userExiste == null || !_connectionService.VerifyPassword(user.Password, userExiste.Password))
                 throw new ArgumentException("La connexion a échoué : e-mail ou mot de passe incorrect.");
 
             var claims = new List<Claim>
                 {
                 new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userExiste.Id)),
-                new Claim(ClaimTypes.Name, $"{userExiste.FirstName} {userExiste.LastName}"),
+                new Claim(ClaimTypes.Name, $"{userExiste.UserName}"),
                 new Claim(ClaimTypes.Email, user.Email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
@@ -85,6 +101,46 @@ namespace Api.Service
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        /// Update user
+
+
+        public async Task<string> FollowUserAsync(int userIdFollowed)
+        {
+            var userInfo = _connectionService.GetCurrentUserInfo();
+            if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
+            User userExiste = await _context.Users.FindAsync(userIdFollowed).ConfigureAwait(false);
+            if (userExiste == null)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas.");
+
+            Follow newFollow = new Follow();
+            newFollow.UpdateDate = DateTime.Now;
+            newFollow.CreateDate = DateTime.Now;
+            newFollow.UserId = userInfo.Id;
+            newFollow.FollowUserId = userIdFollowed;
+
+            await _context.Follow.AddAsync(newFollow);
+            await _context.SaveChangesAsync();
+
+            return "";
+
+        }
+
+        public async Task<string> UpdateUserAsync(bool profilePrivacy)
+        {
+            var userInfo = _connectionService.GetCurrentUserInfo();
+            if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
+            User user = await _context.Users.FindAsync(userInfo.Id);
+
+            user.ProfilePrivacy = profilePrivacy;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return "la modification du profil a réussi";
+
+            /// Update user
+        }
     }
 }

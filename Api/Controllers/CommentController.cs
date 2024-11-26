@@ -20,7 +20,7 @@ namespace Api.Controllers
         /// <returns></returns>
         [HttpPost("create/{postId}")]
         //[Authorize()]
-        public async Task<ActionResult<Comments>> CreateComment([FromForm] Comments comment, int postId)
+        public async Task<ActionResult<Comments>> CreateComment(Comments comment, int postId)
         {
             try
             {

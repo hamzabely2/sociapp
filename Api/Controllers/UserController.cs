@@ -1,6 +1,7 @@
 ﻿using Api.Entity;
 using Api.Model.DTO;
 using Api.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -13,14 +14,34 @@ namespace Api.Controllers
 
         public UserController(IUserService userService) {
             _userService = userService;
-        } 
+        }
+
+        /// <summary>
+        ///get all users,
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("get")]
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
+            try
+            {
+                var result = await _userService.GetAllUsersAsync();
+                string message = "list utilisateur";
+                return Ok(new { message, result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
         /// <summary>
         ///login,
         /// </summary>
         /// <returns></returns>
         [HttpPost("login")]
-        public async Task<ActionResult<List<Post>>> Login([FromForm] LoginUserDTO user)
+        public async Task<ActionResult<string>> Login( LoginUserDTO user)
         {
             try
             {
@@ -39,19 +60,63 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("register")]
-        public async Task<ActionResult<List<Post>>> Register([FromForm] User user)
+        public async Task<ActionResult<List<Post>>> Register( User user)
         {
             try
             {
                 var token = await _userService.RegisterAsync(user);
-                string message = "le user a été cree avec succès";
+                string message = "le utilisateur a été cree avec succès";
                 return Ok(new { message, token });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-          
         }
+
+
+
+
+            /// <summary>
+            /// fololow
+            /// </summary>
+            /// <returns></returns>
+            [HttpPost("follow")]
+            public async Task<ActionResult<string>> FollowUser( int userIdFollowed)
+            {
+                try
+                {
+                    var token = await _userService.FollowUserAsync(userIdFollowed);
+                    string message = "";
+                    return Ok(new { message, token });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+            }
+
+
+            /// <summary>
+            /// update user
+            /// </summary>
+            /// <returns></returns>
+            [HttpPut("update")]
+            [Authorize()]
+
+            public async Task<ActionResult<string>> UpdateUser(bool profilePrivacy)
+            {
+                try
+                {
+                    var token = await _userService.UpdateUserAsync(profilePrivacy);
+                    string message = "";
+                    return Ok(new { message, token });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+            }
     }
 }
+

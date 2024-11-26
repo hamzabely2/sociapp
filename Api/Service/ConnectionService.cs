@@ -4,14 +4,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using System.Security.AccessControl;
 
 
 namespace Api.Service
 {
     public interface IConnectionService
     {
-        UserInfo GetCurrentUserInfo(IHttpContextAccessor _httpContextAccessor);
-        void AddTokenCookie(string token, IHttpContextAccessor _httpContextAccessor);
+        UserInfo GetCurrentUserInfo();
+        void AddTokenCookie(string token);
         string HashPassword(string password);
         bool VerifyPassword(string password, string hashedPassword);
         JwtSecurityToken CreateToken(IEnumerable<Claim> claims);
@@ -20,13 +21,14 @@ namespace Api.Service
     public class ConnectionService : IConnectionService
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConnectionService(IConfiguration configuration)
+        public ConnectionService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
-
+            _httpContextAccessor = httpContextAccessor;
         }
-        public UserInfo GetCurrentUserInfo(IHttpContextAccessor _httpContextAccessor)
+        public UserInfo GetCurrentUserInfo()
         {
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -51,7 +53,7 @@ namespace Api.Service
             };
         }
 
-        public void AddTokenCookie(string token, IHttpContextAccessor _httpContextAccessor)
+        public void AddTokenCookie(string token)
         {
             var cookieOptions = new CookieOptions
             {

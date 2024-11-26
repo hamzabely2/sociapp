@@ -7,10 +7,10 @@ namespace Api.Entity
     {
         [Key]
         public int Id { get; set; }
-        public required string Title { get; set; }
-        public required string MediaUrl { get; set; }
-        public TypePost Type { get; set; }
-        public required string DownloadUrl { get; set; }
+        public string Title { get; set; }
+        public string MediaUrl { get; set; }
+        public string Type { get; set; }
+        public string DownloadUrl { get; set; }
         public int UserId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
