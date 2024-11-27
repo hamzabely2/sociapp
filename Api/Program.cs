@@ -16,6 +16,7 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFollowService, FollowService>();
 
 
 builder.Services.AddControllers();
@@ -42,10 +43,9 @@ var app = builder.Build();
     app.UseSwaggerUI();
 //}
 
-// Configuration des services
 builder.Configuration.AddEnvironmentVariables();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 builder.Services.AddHttpContextAccessor();
 
 app.UseAuthorization();

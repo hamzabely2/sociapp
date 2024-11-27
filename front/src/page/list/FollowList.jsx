@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavBar from '../components/NavBar'
 import Cookies from "universal-cookie";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function FollowList() {
   const [users, setUsers] = useState([]);
@@ -17,30 +20,36 @@ export default function FollowList() {
             headers: {
               Authorization: `Bearer ${cookies.get("token")}`,
             },
-          }
-        );
+          });
         setUsers(response.data);
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        setError('error')
       }
     };
 
     fetchUsers();
   }, []);
 
-  const handleUnFollow = async (userId) => {
+  const handleUnFollow = async (userIdFollowed) => {
     try {
-      await axios.post(`${process.env.REACT_APP_URL}api/users/${userId}/follow`);
-      alert(`Vous suivez maintenant l'utilisateur avec l'ID ${userId}.`);
+      const response = await axios.post(`${process.env.REACT_APP_URL}api/unfollowe-user/${userIdFollowed}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.get("token")}`,
+          },
+        });
+      if (response.status === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.warning("L'action a échoué.");
+      }
     } catch (err) {
-      console.error('Failed to follow user:', err);
-      alert('Échec du suivi. Veuillez réessayer.');
+      toast.warning("L'action a échoué.");
     }
   };
 
   return (
-    <div classNa
-    me="min-h-full">
+    <div className="min-h-full">
       <NavBar />
       <main>
         {!error ? (<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">

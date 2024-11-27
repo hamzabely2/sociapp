@@ -1,12 +1,14 @@
 ﻿using Api.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Service
 {
 
     public interface IFollowService
     {
-       // Task<List<User>> GetFollowedUsersAsync();
+        Task<List<User>> GetFollowedUsersAsync();
         Task<string> FollowUserAsync(int userIdFollowed);
+        Task<string> UnFollowUserAsync(int userIdFollowed);
     }
         public class FollowService : IFollowService
          {
@@ -20,35 +22,32 @@ namespace Api.Service
         }
 
 
-            /// <summary>
-            /// Récupère tous les utilisateurs auxquels l'utilisateur connecté est abonné.
-            /// </summary>
-            /// <returns>Liste des utilisateurs abonnés.</returns>
-        /*    public async Task<List<User>> GetFollowedUsersAsync()
+        /// <summary>
+        /// Récupère tous les utilisateurs auxquels l'utilisateur connecté est abonné.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<User>> GetFollowedUsersAsync()
         {
-            // Récupérer l'utilisateur actuellement connecté
             var userInfo = _connectionService.GetCurrentUserInfo();
             if (userInfo.Id == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
-            // Vérifie si l'utilisateur existe dans la base
             var userExists = await _context.Users.AnyAsync(u => u.Id == userInfo.Id);
             if (!userExists)
                 throw new ArgumentException("L'utilisateur spécifié n'existe pas.");
 
-            // Récupérer les IDs des utilisateurs suivis
             var followedUserIds = await _context.Follows
                 .Where(f => f.UserId == userInfo.Id)
-                .Select(f => f.Id)
+                .Select(f => f.FollowUserId) 
                 .ToListAsync();
 
-            // Récupérer les informations des utilisateurs suivis
             var followedUsers = await _context.Users
                 .Where(u => followedUserIds.Contains(u.Id))
                 .ToListAsync();
 
             return followedUsers;
-        }*/
+        }
+
 
         public async Task<string> FollowUserAsync(int userIdFollowed)
         {
@@ -69,8 +68,35 @@ namespace Api.Service
             await _context.Follows.AddAsync(newFollow);
             await _context.SaveChangesAsync();
 
-            return "";
+            return "maintenant vous suive cet utilisateur";
+        }
+        /// <summary>
+        /// unnfollow user
+        /// </summary>
+        /// <param name="userIdFollowed"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<string> UnFollowUserAsync(int userIdFollowed)
+        {
+            var userInfo = _connectionService.GetCurrentUserInfo();
+            if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur actuel n'existe pas");
 
+            var userExists = await _context.Users.FindAsync(userIdFollowed).ConfigureAwait(false);
+            if (userExists == null)
+                throw new ArgumentException("L'action a échoué : l'utilisateur à ne plus suivre n'existe pas.");
+
+            var followRelation = await _context.Follows
+                .FirstOrDefaultAsync(f => f.Id == userInfo.Id && f.Id == userIdFollowed)
+                .ConfigureAwait(false);
+
+            if (followRelation == null)
+                throw new ArgumentException("L'action a échoué : vous ne suivez pas cet utilisateur.");
+
+            _context.Follows.Remove(followRelation);
+            await _context.SaveChangesAsync();
+
+            return "Vous ne suivez plus cet utilisateur.";
         }
     }
 }

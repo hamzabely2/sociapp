@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "universal-cookie";
 import NavBar from "../components/NavBar";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function PostList() {
   const [posts, setPosts] = useState([]);
@@ -18,12 +20,16 @@ export default function PostList() {
             },
           }
         );
-        setPosts(response.data);
+        if (response.status === 200) {
+          setPosts(response.data);
+          toast.success(response.data.message);
+        }else{
+          toast.warning("L'action a échoué.");
+        }
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        toast.warning(error);
       }
     };
-
     fetchPosts();
   }, []);
 

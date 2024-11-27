@@ -17,7 +17,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        ///get  user,
+        ///get user,
         /// </summary>
         /// <returns></returns>
         [HttpGet("get")]

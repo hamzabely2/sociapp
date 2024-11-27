@@ -8,15 +8,10 @@ namespace Api.Controllers
     //[Authorize()]
     public class PostController : ControllerBase
     {
-
-        private readonly string _connectionString;
-        private readonly string _containerName;
         private readonly IPostService _postService;                                                                
         public PostController(IPostService postService, IConfiguration configuration)
         {
             _postService = postService;
-            _connectionString = configuration["AzureStorage:ConnectionString"];
-            _containerName = configuration["AzureStorage:ContainerName"];
         }
 
 
@@ -85,12 +80,12 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeletePost(int id)
+        [HttpDelete("delete-post/{postId}")]
+        public async Task<IActionResult> DeletePost(int postId)
         {
             try
             {
-                Post result = await _postService.DeletePostAsync(id);
+                Post result = await _postService.DeletePostAsync(postId);
                 string message = "le post a été supprime avec succès";
                 return Ok(new { message, result });
             }

@@ -8,6 +8,7 @@ import NoPage from './page/noPage/NoPage';
 import Login from './page/connexion/Login';
 import Register from './page/connexion/Register';
 import PostUser from './page/list/PostUser';
+import { toast, ToastContainer } from 'react-toastify';
 
 const cookies = new Cookies();
 
@@ -24,6 +25,7 @@ function App() {
 
   return (
     <BrowserRouter>
+     <ToastContainer />
       <Routes>
         <Route path="/login" element={!isAuthenticated() === false ? <Navigate to="/" replace /> : <Login />} />
         <Route path="/register" element={!isAuthenticated() === false ? <Navigate to="/" replace /> : <Register />} />

@@ -1,4 +1,5 @@
 ﻿using Api.Service;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services
@@ -63,6 +64,7 @@ namespace Api.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
+        /// sauf si les utlise est en mod eprive ne montre pas ses postes
         public async Task<List<Post>> GetAllPostsUserAsync()
         {
             var userInfo = _connectionService.GetCurrentUserInfo();
@@ -101,17 +103,17 @@ namespace Api.Services
 
         public async Task<Post> CreatePostAsync(Post post)
         {
-            //var userInfo = _connectionService.GetCurrentUserInfo();
-            int userId = 1;
+            var userInfo = _connectionService.GetCurrentUserInfo();
+            
 
-            if (userId == 0)
+            if (userInfo.Id == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             var file = post.MediaUrl;
 
             post.CreateDate = DateTime.Now;
             post.UpdateDate = DateTime.Now;
-            post.UserId = userId;
+            post.UserId = userInfo.Id;
 
             if (file == null || file.Length == 0)
                 throw new ArgumentException("L'action a échoué : Aucun fichier n'a été téléchargé.");
@@ -119,9 +121,18 @@ namespace Api.Services
             if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
                 throw new ArgumentException("L'action a échoué : Type de fichier invalide.");
 
-            /*// Ajout du fichier dans le stockage
+            // Ajout du fichier dans le stockage
             var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
-            var containerClient = blobServiceClient.GetBlobContainerClient(_configuration["AzureStorage:ContainerName"]);
+            string containerName = "";
+            if (file.ContentType.StartsWith("image/"))
+            {
+                containerName = "image";
+            }else if (file.ContentType.StartsWith("video/"))
+            {
+                containerName = "video";
+            }
+
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
             string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
             var blobClient = containerClient.GetBlobClient(fileName);
@@ -132,7 +143,7 @@ namespace Api.Services
             }
 
             // Stockez l'URL du fichier dans la propriété DownloadUrl
-            post.DownloadUrl = blobClient.Uri.ToString();*/
+            post.DownloadUrl = blobClient.Uri.ToString();
 
 
             await _context.Posts.AddAsync(post);

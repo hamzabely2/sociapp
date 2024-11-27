@@ -1,42 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavBar from '../components/NavBar'
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Cookies from "universal-cookie";
+
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
+  const cookies = new Cookies();
 
-  // Fetch users from the API
+  useEffect(() => {
   const fetchUsers = async () => {
     setError('');
     try {
       const response = await axios.get(`${process.env.REACT_APP_URL}user/get-all-users`);
-      console.log(response)
-      setUsers(response.data.result); // Assume API returns an array of users
+      if (response.status === 200) {
+        setUsers(response.data.result); 
+        toast.success(response.data.message);
+      } else {
+        toast.warning("L'action a échoué.");
+      }
     } catch (err) {
-      console.error('Failed to fetch users:', err);
-      setError('Échec de la récupération des utilisateurs.');
+      toast.warning(err);
     } 
   };
+}, [users]);
 
-  const handleFollow = async (userId) => {
+
+  const handleFollow = async (userIdFollowed) => {
     try {
-      await axios.post(`${process.env.REACT_APP_URL}api/follow/followe-user`);
-      alert(`Vous suivez maintenant l'utilisateur avec l'ID ${userId}.`);
+      const response = await axios.post(`${process.env.REACT_APP_URL}api/followe-user/${userIdFollowed}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.get("token")}`,
+          },
+        });
+      if (response.status === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.warning("L'action a échoué.");
+      }
     } catch (err) {
-      console.error('Failed to follow user:', err);
-      alert('Échec du suivi. Veuillez réessayer.');
+      toast.warning(err);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-
   return (
-    <div classNa
-    me="min-h-full">
+    <div className="min-h-full">
       <NavBar />
       <main>
         {!error ? (<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">

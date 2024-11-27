@@ -1,6 +1,5 @@
 ﻿using Api.Service;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -17,10 +16,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// get follow by user
+        /// get list follow by user
         /// </summary>
         /// <returns></returns>
-        /*[HttpGet("followed-users")]
+        [HttpGet("get-list-followed-users")]
         public async Task<IActionResult> GetFollowedUsers()
         {
             try
@@ -36,19 +35,38 @@ namespace Api.Controllers
             {
                 return StatusCode(500, new { message = "Erreur serveur", details = ex.Message });
             }
-        }*/
+        }
 
         /// <summary>
-        /// fololow
+        /// fololow user
         /// </summary>
         /// <returns></returns>
-        [HttpPost("follow")]
-        [Authorize()]
+        [HttpPost("followe-user")]
         public async Task<ActionResult<string>> FollowUser(int userIdFollowed)
         {
             try
             {
                 var token = await _followService.FollowUserAsync(userIdFollowed);
+                string message = "";
+                return Ok(new { message, token });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// unfololow user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("followe-user")]
+        [Authorize()]
+        public async Task<ActionResult<string>> UnFollowUser(int userIdFollowed)
+        {
+            try
+            {
+                var token = await _followService.UnFollowUserAsync(userIdFollowed);
                 string message = "";
                 return Ok(new { message, token });
             }
