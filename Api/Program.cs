@@ -42,6 +42,8 @@ var app = builder.Build();
     app.UseSwaggerUI();
 //}
 
+// Configuration des services
+builder.Configuration.AddEnvironmentVariables();
 
 //app.UseHttpsRedirection();
 builder.Services.AddHttpContextAccessor();

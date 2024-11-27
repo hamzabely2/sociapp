@@ -19,11 +19,23 @@ namespace Api.Controllers
             _containerName = configuration["AzureStorage:ContainerName"];
         }
 
+
         /// <summary>
         /// get all post
         /// </summary>
         /// <returns></returns>
-        [HttpGet("get")]
+        [HttpGet("get-all-user-posts")]
+        public async Task<ActionResult<List<Post>>> GetAllPostsUser()
+        {
+            var posts = await _postService.GetAllPostsUserAsync();
+            return Ok(posts);
+        }
+
+        /// <summary>
+        /// get all post
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("get-follow-posts")]
         public async Task<ActionResult<List<Post>>> GetAllPosts()
         { 
             var posts = await _postService.GetAllPostsAsync();
@@ -35,7 +47,7 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("get/{id}")]
+        [HttpGet("get-post/{id}")]
         public async Task<ActionResult<Post>> GetPostById(int id)
         {
             var post = await _postService.GetPostByIdAsync(id);
@@ -51,7 +63,7 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>
-        [HttpPost("create")]
+        [HttpPost("create-post")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<Post>> CreatePost( Post post)
         {

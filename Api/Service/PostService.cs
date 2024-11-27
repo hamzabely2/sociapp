@@ -1,6 +1,4 @@
-﻿using Api.Entity;
-using Api.Service;
-using Azure.Storage.Blobs;
+﻿using Api.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services
@@ -11,6 +9,7 @@ namespace Api.Services
         Task<Post> GetPostByIdAsync(int postId);
         Task<Post> CreatePostAsync(Post post);
         Task<Post> DeletePostAsync(int postId);
+        Task<List<Post>> GetAllPostsUserAsync();
     }
 
     public class PostService : IPostService
@@ -34,25 +33,51 @@ namespace Api.Services
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// get post 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<List<Post>> GetAllPostsAsync()
         {
-            //var userInfo = _connectionService.GetCurrentUserInfo();
+            var userInfo = _connectionService.GetCurrentUserInfo();
 
-            if (1 == 0)
+            if (userInfo.Id == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             var followedUserIds = await _context.Follows
-                .Where(f => f.UserId == 1) //a modifie
-                .Select(f => f.FollowUserId)         
+                .Where(f => f.UserId == userInfo.Id) 
+                .Select(f => f.FollowUserId)
                 .ToListAsync();
 
             var posts = await _context.Posts
-                .Where(p => followedUserIds.Contains(p.UserId) 
-                            && !_context.Users.Any(u => u.Id == p.UserId && u.ProfilePrivacy)) 
+                .Where(p => followedUserIds.Contains(p.UserId)
+                            && !_context.Users.Any(u => u.Id == p.UserId && u.ProfilePrivacy))
                 .ToListAsync();
 
             return posts;
         }
+
+        /// <summary>
+        /// get post create by user
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<List<Post>> GetAllPostsUserAsync()
+        {
+            var userInfo = _connectionService.GetCurrentUserInfo();
+
+            if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
+            var userPosts = await _context.Posts
+                                            .Where(post => post.UserId == 1)
+                                            .OrderByDescending(post => post.CreateDate)
+                                            .ToListAsync();
+
+            return userPosts;
+        }
+
 
         /// <summary>
         /// get post by id
