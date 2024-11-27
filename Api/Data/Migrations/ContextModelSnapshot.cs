@@ -42,6 +42,8 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Comments");
                 });
 
@@ -91,43 +93,9 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("Api.Entity.Post", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("DownloadUrl")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("MediaUrl")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Api.Entity.User", b =>
@@ -162,6 +130,47 @@ namespace api.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DownloadUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Api.Entity.Comments", b =>
+                {
+                    b.HasOne("Api.Entity.User", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Api.Entity.Follow", b =>
                 {
                     b.HasOne("Api.Entity.User", null)
@@ -171,9 +180,22 @@ namespace api.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Api.Entity.Notification", b =>
+                {
+                    b.HasOne("Api.Entity.User", null)
+                        .WithMany("Notification")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Api.Entity.User", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Followers");
+
+                    b.Navigation("Notification");
                 });
 #pragma warning restore 612, 618
         }

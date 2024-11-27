@@ -9,22 +9,14 @@ namespace Api.Service
         Task<string> FollowUserAsync(int userIdFollowed);
     }
         public class FollowService : IFollowService
-    {
-
-        private readonly string _connectionString;
-        private readonly string _containerName;
-        private readonly string _accountKey;
+         {
         private readonly IConnectionService _connectionService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Context _context;
-        private readonly IConfiguration _configuration;
 
-        public FollowService(Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public FollowService(Context context, IConnectionService connectionService)
         {
             _context = context;
             _connectionService = connectionService;
-            _httpContextAccessor = httpContextAccessor;
-            _configuration = configuration;
         }
 
 

@@ -15,6 +15,5 @@ namespace Api.Entity
         public ICollection<Follow> Followers { get; set; } = new List<Follow>();
         public ICollection<Comments> Comments { get; set; } = new List<Comments>();
         public ICollection<Notification> Notification { get; set; } = new List<Notification>();
-
     }
 }

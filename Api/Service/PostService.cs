@@ -9,7 +9,7 @@ namespace Api.Services
     {
         Task<List<Post>> GetAllPostsAsync();
         Task<Post> GetPostByIdAsync(int postId);
-        Task<Post> CreatePostAsync(Post post, IFormFile file);
+        Task<Post> CreatePostAsync(Post post);
         Task<Post> DeletePostAsync(int postId);
     }
 
@@ -36,13 +36,13 @@ namespace Api.Services
 
         public async Task<List<Post>> GetAllPostsAsync()
         {
-            var userInfo = _connectionService.GetCurrentUserInfo();
+            //var userInfo = _connectionService.GetCurrentUserInfo();
 
-            if (userInfo.Id == 0)
+            if (1 == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             var followedUserIds = await _context.Follows
-                .Where(f => f.UserId == userInfo.Id)
+                .Where(f => f.UserId == 1) //a modifie
                 .Select(f => f.FollowUserId)         
                 .ToListAsync();
 
@@ -74,57 +74,48 @@ namespace Api.Services
             }
         }
 
-        /// <summary>
-        /// create post by users
-        /// </summary>
-        /// <param name="post"></param>
-        /// <returns></returns>
-        public async Task<Post> CreatePostAsync(Post post, IFormFile file)
+        public async Task<Post> CreatePostAsync(Post post)
         {
-            var userInfo = _connectionService.GetCurrentUserInfo();
-            int userId = userInfo.Id;
+            //var userInfo = _connectionService.GetCurrentUserInfo();
+            int userId = 1;
 
             if (userId == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
+            var file = post.MediaUrl;
 
             post.CreateDate = DateTime.Now;
             post.UpdateDate = DateTime.Now;
             post.UserId = userId;
 
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("L'action a échoué : Aucun fichier n'a été téléchargé.");
+
             if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
-                 throw new ArgumentException("L'action a échoué: Type de fichier invalide.");
+                throw new ArgumentException("L'action a échoué : Type de fichier invalide.");
 
-            //add file in storage
-            if (file != null && file.Length > 0)
+            /*// Ajout du fichier dans le stockage
+            var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
+            var containerClient = blobServiceClient.GetBlobContainerClient(_configuration["AzureStorage:ContainerName"]);
+
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var blobClient = containerClient.GetBlobClient(fileName);
+
+            using (var stream = file.OpenReadStream())
             {
-                var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
-                var containerClient = blobServiceClient.GetBlobContainerClient(_configuration["AzureStorage:ContainerName"]);
-
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                var blobClient = containerClient.GetBlobClient(fileName);
-
-                using (var stream = file.OpenReadStream())
-                {
-                    await blobClient.UploadAsync(stream);
-                }
-
-                post.MediaUrl = blobClient.Uri.ToString();
+                await blobClient.UploadAsync(stream);
             }
+
+            // Stockez l'URL du fichier dans la propriété DownloadUrl
+            post.DownloadUrl = blobClient.Uri.ToString();*/
+
 
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
 
-            Post postCreate = await _context.Posts.FindAsync(post.Id);
-
-            if (postCreate != null)
-            {
-                return postCreate;
-            }
-            else
-            {
-                throw new ArgumentException("L'action a échoué");
-            }
+            return post;
         }
+
 
         /// <summary>
         /// delete post by users

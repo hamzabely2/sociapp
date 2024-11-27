@@ -1,11 +1,11 @@
-﻿using Api.Entity;
-using Api.Services;
+﻿using Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize()]
     public class PostController : ControllerBase
     {
 
@@ -46,20 +46,19 @@ namespace Api.Controllers
             return Ok(post);
         }
 
-
         /// <summary>
         /// create post
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>
         [HttpPost("create")]
-        //[Authorize()]
-        public async Task<ActionResult<Post>> CreatePost(Post post, IFormFile file)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Post>> CreatePost( Post post)
         {
             try
             {
-                Post result = await _postService.CreatePostAsync(post,file);
-                string message = "le post a été ajoutée avec succès";
+                var result = await _postService.CreatePostAsync(post);
+                string message = "Le post a été ajouté avec succès";
                 return Ok(new { message, result });
             }
             catch (Exception ex)
@@ -67,6 +66,7 @@ namespace Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
         /// <summary>
         /// delete post
@@ -76,7 +76,6 @@ namespace Api.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
-
             try
             {
                 Post result = await _postService.DeletePostAsync(id);

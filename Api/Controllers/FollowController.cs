@@ -1,4 +1,5 @@
 ﻿using Api.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("follow")]
+        [Authorize()]
         public async Task<ActionResult<string>> FollowUser(int userIdFollowed)
         {
             try

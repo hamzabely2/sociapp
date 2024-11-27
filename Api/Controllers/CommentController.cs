@@ -1,5 +1,6 @@
 ﻿using Api.Entity;
 using Api.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -19,7 +20,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("create/{postId}")]
-        //[Authorize()]
+        [Authorize()]
         public async Task<ActionResult<Comments>> CreateComment(Comments comment, int postId)
         {
             try
@@ -40,6 +41,7 @@ namespace Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("delete/{id}")]
+        [Authorize()]
         public async Task<ActionResult<Comments>> DeleteComments(int commentId)
         {
             try

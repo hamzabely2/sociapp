@@ -23,12 +23,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
-
-
-// Adding Authentication
-var validAudience = builder.Configuration["JWT:ValidAudience"];
-var validIssuer = builder.Configuration["JWT:ValidIssuer"];
-var secret = builder.Configuration["JWT:Secret"];
 var reactApp = builder.Configuration["Cors:url"];
 
 string[] origins = new string[] { reactApp, "http://localhost:3000" };
@@ -42,11 +36,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-//if (app.Environment.IsDevelopment())
-//{
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
-//}
+}
 
 
 //app.UseHttpsRedirection();
