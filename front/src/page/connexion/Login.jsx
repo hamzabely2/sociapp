@@ -1,58 +1,47 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { setCookie } from './Token';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
 
-    const data = {
-      email,
-      password,
-    };
+    const data = { email, password };
 
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_URL}user/login`,
         data
       );
-
-      // Extrait le token de la réponse
-      const { token } = response.data;
-
-      // Vérifie si un token a été renvoyé
-      if (token) {
-        // Définit le token dans un cookie avec une durée de 7 jours
-        document.cookie = `authToken=${token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; HttpOnly`;
-
-        console.log('Token saved in cookies.');
+      if (response.status === 200) {
+        setCookie(response.data.token);
+        toast.success(response.data.message || 'Connexion réussie !');
+        navigate('/');
       } else {
-        console.error('No token received from the server.');
+        toast.warning("L'action a échoué.");
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      setError('Échec de la connexion. Veuillez vérifier vos informations.');
-    } finally {
-      setLoading(false);
+      toast.error('Échec de la connexion. Veuillez vérifier vos informations.');
     }
   };
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <ToastContainer />
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <Link to="/">
-        <img
-          className="mx-auto h-[180px] w-auto"
-          src="/img/logo.png"
-          alt="Pot Shop"
-        />
+          <img
+            className="mx-auto h-[180px] w-auto"
+            src="/img/logo.png"
+            alt="Pot Shop"
+          />
         </Link>
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           Se connecter
@@ -96,18 +85,16 @@ export default function Login() {
               />
             </div>
           </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
           <div>
+            <Link to="/register">
+            <p className='m-1 text-indigo'>inscrivez-vous maintenant</p>
+            </Link>
+           
             <button
               type="submit"
-              className={`flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
-                loading ? 'opacity-50' : ''
-              }`}
-              disabled={loading}
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              {loading ? 'Chargement...' : 'Valider'}
+              Valider
             </button>
           </div>
         </form>

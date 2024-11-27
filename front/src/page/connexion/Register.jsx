@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { setCookie } from './Token';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Register() {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
-    setLoading(true);
+    e.preventDefault();
 
     const data = {
       userName,
@@ -23,17 +25,21 @@ export default function Register() {
         `${process.env.REACT_APP_URL}user/register`,
         data
       );
-      console.log('Registration successful:', response.data);
-
+      if (response.status === 200) {
+        toast.success(response.data.message || 'Inscription réussie !');
+        setCookie(response.data.token);
+        navigate('/');
+      } else {
+        toast.warning("L'action a échoué.");
+      }
     } catch (error) {
-      console.error('Registration failed:', error);
-    } finally {
-      setLoading(false);
+      toast.error('Échec de l\'inscription. Veuillez réessayer.');
     }
   };
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <ToastContainer />
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <Link to="/">
           <img
@@ -106,12 +112,9 @@ export default function Register() {
           <div>
             <button
               type="submit"
-              className={`flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
-                loading ? 'opacity-50' : ''
-              }`}
-              disabled={loading}
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              {loading ? 'Chargement...' : "S'inscrire"}
+              S'inscrire
             </button>
           </div>
         </form>
