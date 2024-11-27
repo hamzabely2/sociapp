@@ -45,7 +45,7 @@ var app = builder.Build();
 // Configuration des services
 builder.Configuration.AddEnvironmentVariables();
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 builder.Services.AddHttpContextAccessor();
 
 app.UseAuthorization();

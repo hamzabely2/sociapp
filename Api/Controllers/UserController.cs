@@ -39,7 +39,7 @@ namespace Api.Controllers
         ///get all users,
         /// </summary>
         /// <returns></returns>
-        [HttpGet("getAll")]
+        [HttpGet("get-all-users")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
             try
