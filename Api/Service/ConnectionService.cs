@@ -3,8 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using System.Security.AccessControl;
 
 
 namespace Api.Service
@@ -12,7 +10,6 @@ namespace Api.Service
     public interface IConnectionService
     {
         UserInfo GetCurrentUserInfo();
-        void AddTokenCookie(string token);
         string HashPassword(string password);
         bool VerifyPassword(string password, string hashedPassword);
         JwtSecurityToken CreateToken(IEnumerable<Claim> claims);
@@ -28,6 +25,11 @@ namespace Api.Service
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
         }
+
+        /// <summary>
+        /// get info user
+        /// </summary>
+        /// <returns></returns>
         public UserInfo GetCurrentUserInfo()
         {
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -53,17 +55,6 @@ namespace Api.Service
             };
         }
 
-        public void AddTokenCookie(string token)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                Expires = DateTime.UtcNow.AddDays(1),
-                HttpOnly = true,
-                Secure = true,
-                Domain = "www.sociappe.com"
-            };
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("token", token, cookieOptions);
-        }
 
         /// <summary>
         /// hash password
@@ -106,9 +97,7 @@ namespace Api.Service
                 expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: creds
             );
-
             return token;
         }
-
     }
 }

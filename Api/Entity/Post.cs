@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Api.Model;
 
 namespace Api.Entity
 {

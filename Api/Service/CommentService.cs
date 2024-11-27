@@ -1,6 +1,4 @@
 ﻿using Api.Entity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 namespace Api.Service
 {

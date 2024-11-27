@@ -7,7 +7,6 @@ public class Context : DbContext
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comments> Comments { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Follow> Follow { get; set; }
-    public DbSet<Notification> Notification { get; set; }
-
+    public DbSet<Follow> Follows { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 }

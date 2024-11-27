@@ -34,14 +34,23 @@ namespace Api.Services
             _configuration = configuration;
         }
 
-        /// <summary>
-        /// get  all post
-        /// </summary>
-        /// <returns></returns>
-        /// sauf si les utlise est en mode prive ne montre pas ses postes
         public async Task<List<Post>> GetAllPostsAsync()
         {
-            var posts = await _context.Posts.ToListAsync();
+            var userInfo = _connectionService.GetCurrentUserInfo();
+
+            if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
+            var followedUserIds = await _context.Follows
+                .Where(f => f.UserId == userInfo.Id)
+                .Select(f => f.FollowUserId)         
+                .ToListAsync();
+
+            var posts = await _context.Posts
+                .Where(p => followedUserIds.Contains(p.UserId) 
+                            && !_context.Users.Any(u => u.Id == p.UserId && u.ProfilePrivacy)) 
+                .ToListAsync();
+
             return posts;
         }
 

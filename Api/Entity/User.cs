@@ -12,5 +12,9 @@ namespace Api.Entity
         public bool ProfilePrivacy { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public ICollection<Follow> Followers { get; set; } = new List<Follow>();
+        public ICollection<Comments> Comments { get; set; } = new List<Comments>();
+        public ICollection<Notification> Notification { get; set; } = new List<Notification>();
+
     }
 }

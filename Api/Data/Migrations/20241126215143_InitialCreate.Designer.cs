@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace api.Data.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20241126105316_InitialCreate")]
+    [Migration("20241126215143_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -68,7 +68,9 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Follow");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Follows");
                 });
 
             modelBuilder.Entity("Api.Entity.Notification", b =>
@@ -92,7 +94,7 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Api.Entity.Post", b =>
@@ -161,6 +163,20 @@ namespace api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Api.Entity.Follow", b =>
+                {
+                    b.HasOne("Api.Entity.User", null)
+                        .WithMany("Followers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Api.Entity.User", b =>
+                {
+                    b.Navigation("Followers");
                 });
 #pragma warning restore 612, 618
         }

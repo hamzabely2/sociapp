@@ -17,10 +17,29 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        ///get all users,
+        ///get  user,
         /// </summary>
         /// <returns></returns>
         [HttpGet("get")]
+        public async Task<ActionResult<List<User>>> GetUser()
+        {
+            try
+            {
+                var result = await _userService.GetUserAsync();
+                string message = "utilisateur";
+                return Ok(new { message, result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        ///get all users,
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getAll")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
             try
@@ -73,29 +92,6 @@ namespace Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-
-
-
-            /// <summary>
-            /// fololow
-            /// </summary>
-            /// <returns></returns>
-            [HttpPost("follow")]
-            public async Task<ActionResult<string>> FollowUser( int userIdFollowed)
-            {
-                try
-                {
-                    var token = await _userService.FollowUserAsync(userIdFollowed);
-                    string message = "";
-                    return Ok(new { message, token });
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
-            }
-
 
             /// <summary>
             /// update user

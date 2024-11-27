@@ -54,7 +54,7 @@ namespace Api.Controllers
         /// <returns></returns>
         [HttpPost("create")]
         //[Authorize()]
-        public async Task<ActionResult<Post>> CreatePost( Post post, IFormFile file)
+        public async Task<ActionResult<Post>> CreatePost(Post post, IFormFile file)
         {
             try
             {
