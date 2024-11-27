@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - apiSociapp
+name: Build and deploy ASP.Net Core app to Azure Web App - apisociapp
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build  Api/api.csproj --configuration Release
+        run: dotnet build Api/api.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish Api/api.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
@@ -51,15 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7C9D28CF35374F2C91374FE77FC0FB3B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2BC92FD3FF68438E926A339AB0CE621C }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F0B326942F7A4494A69459AB9813660B }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0A4738937D604118909A6A4663C37FA0 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_40D01CDDB2DD47499A50A447E044BD57 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E41BD2ADD980417A9B78BA74086A05C6 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'apiSociapp'
+          app-name: 'apisociapp'
           slot-name: 'Production'
           package: .
           
