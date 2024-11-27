@@ -13,7 +13,6 @@ namespace Api.Service
         private readonly Context _context;
         private readonly IConnectionService _connectionService;
 
-
         public CommentService(Context context, IConnectionService connectionService)
         {
             _connectionService = connectionService;
