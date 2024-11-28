@@ -1,4 +1,5 @@
-﻿using Api.Service;
+﻿using Api.Entity;
+using Api.Service;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 
@@ -115,39 +116,56 @@ namespace Api.Services
             post.UpdateDate = DateTime.Now;
             post.UserId = userInfo.Id;
 
-            if (file == null || file.Length == 0)
-                throw new ArgumentException("L'action a échoué : Aucun fichier n'a été téléchargé.");
 
-            if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
-                throw new ArgumentException("L'action a échoué : Type de fichier invalide.");
+            //offline mode
+            if (_configuration["AzureStorage:ConnectionString"] != "")
+            {
+                if (file == null || file.Length == 0)
+                    throw new ArgumentException("L'action a échoué : Aucun fichier n'a été téléchargé.");
 
-            // Ajout du fichier dans le stockage
-            var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
-            string containerName = "";
-            if (file.ContentType.StartsWith("image/"))
-            {
-                containerName = "image";
-            }else if (file.ContentType.StartsWith("video/"))
-            {
-                containerName = "video";
+                if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
+                    throw new ArgumentException("L'action a échoué : Type de fichier invalide.");
+
+                // Ajout du fichier dans le stockage
+                var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
+                string containerName = "";
+                if (file.ContentType.StartsWith("image/"))
+                {
+                    containerName = "image";
+                }
+                else if (file.ContentType.StartsWith("video/"))
+                {
+                    containerName = "video";
+                }
+
+                var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                var blobClient = containerClient.GetBlobClient(fileName);
+
+                using (var stream = file.OpenReadStream())
+                {
+                    await blobClient.UploadAsync(stream);
+                }
+
+                // Stockez l'URL du fichier dans la propriété DownloadUrl
+                post.DownloadUrl = blobClient.Uri.ToString();
             }
-
-            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            var blobClient = containerClient.GetBlobClient(fileName);
-
-            using (var stream = file.OpenReadStream())
-            {
-                await blobClient.UploadAsync(stream);
-            }
-
-            // Stockez l'URL du fichier dans la propriété DownloadUrl
-            post.DownloadUrl = blobClient.Uri.ToString();
-
 
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
+
+            var followers = await _context.Follows
+            .Where(f => f.FollowUserId == userInfo.Id)
+            .ToListAsync();
+
+            var notifications = followers.Select(follower => new Notification
+            {
+                Message = $"{userInfo.UserName} a publié un nouveau post.",
+                UserId = follower.UserId,
+                CreateDate = DateTime.Now,
+                UpdateDate = DateTime.Now,
+            }).ToList();
 
             return post;
         }

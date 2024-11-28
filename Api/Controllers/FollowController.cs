@@ -1,4 +1,5 @@
 ﻿using Api.Service;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,31 +25,29 @@ namespace Api.Controllers
         {
             try
             {
-                var followedUsers = await _followService.GetFollowedUsersAsync();
-                return Ok(followedUsers);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
+                var response = await _followService.GetFollowedUsersAsync();
+                string message = "Liste des utilisateurs suivis";
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Erreur serveur", details = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
+        
         }
 
         /// <summary>
         /// fololow user
         /// </summary>
         /// <returns></returns>
-        [HttpPost("followe-user")]
+        [HttpPost("followe-user/{userIdFollowed}")]
         public async Task<ActionResult<string>> FollowUser(int userIdFollowed)
         {
             try
             {
-                var token = await _followService.FollowUserAsync(userIdFollowed);
-                string message = "";
-                return Ok(new { message, token });
+                var response = await _followService.FollowUserAsync(userIdFollowed);
+                string message = "maintenant vous suive cet utilisateur";
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -60,15 +59,14 @@ namespace Api.Controllers
         /// unfololow user
         /// </summary>
         /// <returns></returns>
-        [HttpPost("followe-user")]
-        [Authorize()]
+        [HttpDelete("unfollowe-user/{userIdFollowed}")]
         public async Task<ActionResult<string>> UnFollowUser(int userIdFollowed)
         {
             try
             {
-                var token = await _followService.UnFollowUserAsync(userIdFollowed);
-                string message = "";
-                return Ok(new { message, token });
+                var response = await _followService.UnFollowUserAsync(userIdFollowed);
+                string message = "L'utilisateur n'est plus suivi";
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {

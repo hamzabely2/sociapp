@@ -1,4 +1,5 @@
 ﻿using Api.Services;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -9,7 +10,7 @@ namespace Api.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;                                                                
-        public PostController(IPostService postService, IConfiguration configuration)
+        public  PostController(IPostService postService, IConfiguration configuration)
         {
             _postService = postService;
         }
@@ -22,8 +23,16 @@ namespace Api.Controllers
         [HttpGet("get-all-user-posts")]
         public async Task<ActionResult<List<Post>>> GetAllPostsUser()
         {
-            var posts = await _postService.GetAllPostsUserAsync();
-            return Ok(posts);
+            try
+            {
+                var respose = await _postService.GetAllPostsUserAsync();
+                string message = "List post ";
+                return Ok(new { message, respose });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         /// <summary>
@@ -32,9 +41,17 @@ namespace Api.Controllers
         /// <returns></returns>
         [HttpGet("get-follow-posts")]
         public async Task<ActionResult<List<Post>>> GetAllPosts()
-        { 
-            var posts = await _postService.GetAllPostsAsync();
-            return Ok(posts);
+        {
+            try
+            {
+                var respose = await _postService.GetAllPostsAsync();
+                string message = "List post";
+                return Ok(new { message, respose });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         /// <summary>
@@ -64,9 +81,9 @@ namespace Api.Controllers
         {
             try
             {
-                var result = await _postService.CreatePostAsync(post);
+                var respose = await _postService.CreatePostAsync(post);
                 string message = "Le post a été ajouté avec succès";
-                return Ok(new { message, result });
+                return Ok(new { message, respose });
             }
             catch (Exception ex)
             {
@@ -85,9 +102,9 @@ namespace Api.Controllers
         {
             try
             {
-                Post result = await _postService.DeletePostAsync(postId);
+                Post respose = await _postService.DeletePostAsync(postId);
                 string message = "le post a été supprime avec succès";
-                return Ok(new { message, result });
+                return Ok(new { message, respose });
             }
             catch (Exception ex)
             {

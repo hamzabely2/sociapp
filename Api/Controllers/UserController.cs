@@ -25,9 +25,9 @@ namespace Api.Controllers
         {
             try
             {
-                var result = await _userService.GetUserAsync();
+                var respose = await _userService.GetUserAsync();
                 string message = "utilisateur";
-                return Ok(new { message, result });
+                return Ok(new { message, respose });
             }
             catch (Exception ex)
             {
@@ -44,9 +44,9 @@ namespace Api.Controllers
         {
             try
             {
-                var result = await _userService.GetAllUsersAsync();
+                var respose = await _userService.GetAllUsersAsync();
                 string message = "list utilisateur";
-                return Ok(new { message, result });
+                return Ok(new { message, respose });
             }
             catch (Exception ex)
             {
@@ -64,9 +64,9 @@ namespace Api.Controllers
         {
             try
             {
-                var token = await _userService.LoginAsync(user);
+                var respose = await _userService.LoginAsync(user);
                 string message = "le token a été cree avec succès";
-                return Ok(new { message, token });
+                return Ok(new { message, respose });
             }
             catch (Exception ex)
             {
@@ -83,9 +83,9 @@ namespace Api.Controllers
         {
             try
             {
-                var token = await _userService.RegisterAsync(user);
+                var respose = await _userService.RegisterAsync(user);
                 string message = "le utilisateur a été cree avec succès";
-                return Ok(new { message, token });
+                return Ok(new { message, respose });
             }
             catch (Exception ex)
             {
@@ -104,9 +104,9 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var token = await _userService.UpdateUserAsync(profilePrivacy);
+                    var respose = await _userService.UpdateUserAsync(profilePrivacy);
                     string message = "";
-                    return Ok(new { message, token });
+                    return Ok(new { message, respose });
                 }
                 catch (Exception ex)
                 {

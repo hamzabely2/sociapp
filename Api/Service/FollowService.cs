@@ -57,19 +57,29 @@ namespace Api.Service
 
             User userExiste = await _context.Users.FindAsync(userIdFollowed).ConfigureAwait(false);
             if (userExiste == null)
-                throw new ArgumentException("L'action a échoué : l'utilisateur n'ex iste pas.");
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas.");
 
-            Follow newFollow = new Follow();
-            newFollow.UpdateDate = DateTime.Now;
-            newFollow.CreateDate = DateTime.Now;
-            newFollow.UserId = userInfo.Id;
-            newFollow.FollowUserId = userIdFollowed;
+            bool alreadyFollowing = await _context.Follows
+                .AnyAsync(f => f.UserId == userInfo.Id && f.FollowUserId == userIdFollowed)
+                .ConfigureAwait(false);
 
-            await _context.Follows.AddAsync(newFollow);
-            await _context.SaveChangesAsync();
+            if (alreadyFollowing)
+                throw new ArgumentException("L'action a échoué : vous suivez déjà cet utilisateur.");
 
-            return "maintenant vous suive cet utilisateur";
+            Follow newFollow = new Follow
+            {
+                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.Now,
+                UserId = userInfo.Id,
+                FollowUserId = userIdFollowed
+            };
+
+            await _context.Follows.AddAsync(newFollow).ConfigureAwait(false);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return "Maintenant, vous suivez cet utilisateur.";
         }
+
         /// <summary>
         /// unnfollow user
         /// </summary>
