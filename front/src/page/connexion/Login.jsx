@@ -21,14 +21,14 @@ export default function Login() {
         data
       );
       if (response.status === 200) {
-        setCookie(response.data.token);
-        toast.success(response.data.message || 'Connexion réussie !');
+        setCookie(response.data.respose);
+        toast.success(response.data.message);
         navigate('/');
       } else {
         toast.warning("L'action a échoué.");
       }
     } catch (error) {
-      toast.error('Échec de la connexion. Veuillez vérifier vos informations.');
+      toast.error(error);
     }
   };
 
@@ -87,9 +87,8 @@ export default function Login() {
           </div>
           <div>
             <Link to="/register">
-            <p className='m-1 text-indigo'>inscrivez-vous maintenant</p>
+            <p className='mb-2text-indigo-500'>inscrivez-vous maintenant</p>
             </Link>
-           
             <button
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

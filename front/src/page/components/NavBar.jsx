@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Disclosure, Menu } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
+import { BellIcon } from "@heroicons/react/24/outline";
+import { Link , useNavigate  } from "react-router-dom";
 import axios from "axios";
 import Cookies from "universal-cookie";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const navigation = [
   { name: "Post", href: "/", current: true },
@@ -18,6 +20,9 @@ function classNames(...classes) {
 export default function NavBar() {
   const cookies = new Cookies();
   const [user, setUser] = useState([]);
+  const navigate = useNavigate();
+
+ 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -30,14 +35,20 @@ export default function NavBar() {
             },
           }
         );
-        setUser(response.data.result);
+        setUser(response.data.respose);
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        toast.error(error);
       }
     };
-  
+
     fetchUser();
   }, []);
+
+  const handleDeconnexion = ( ) =>{
+      cookies.remove('token');
+      navigate('/login');
+      window.location.reload();
+  }
   
   return (
     <>
@@ -120,15 +131,15 @@ export default function NavBar() {
                         </Menu.Item>
                         <Menu.Item >
                           {({ active }) => (
-                            <Link
-                              to="/"
+                            <button
+                              onClick={handleDeconnexion}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
-                              Deconexion
-                            </Link>
+                              Déconexion
+                            </button>
                           )}
                         </Menu.Item>
                       </Menu.Items>

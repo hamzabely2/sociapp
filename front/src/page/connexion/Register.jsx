@@ -27,13 +27,13 @@ export default function Register() {
       );
       if (response.status === 200) {
         toast.success(response.data.message || 'Inscription réussie !');
-        setCookie(response.data.token);
+        setCookie(response.data.respose);
         navigate('/');
       } else {
         toast.warning("L'action a échoué.");
       }
     } catch (error) {
-      toast.error('Échec de l\'inscription. Veuillez réessayer.');
+      toast.error(error);
     }
   };
 
@@ -107,8 +107,10 @@ export default function Register() {
               />
             </div>
           </div>
-
           <div>
+          <Link to="/login">
+            <p className='mb-2  text-indigo-500'>se connecter</p>
+          </Link>
             <button
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

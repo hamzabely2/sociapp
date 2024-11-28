@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './route/ProtectedRoute';
 import Cookies from 'universal-cookie';
-import FollowList from './page/list/FollowList';
-import PostList from './page/list/PostList';
-import UserList from './page/list/UserList';
-import NoPage from './page/noPage/NoPage';
+import NoPage from '../src/page/components/NoPage';
 import Login from './page/connexion/Login';
 import Register from './page/connexion/Register';
-import PostUser from './page/list/PostUser';
-import { toast, ToastContainer } from 'react-toastify';
+import {  ToastContainer } from 'react-toastify';
+import FollowList from './page/userPage/FollowList';
+import PostList from './page/publicPage/PostList';
+import PostUser from './page/userPage/PostUser';
+import UserList from './page/publicPage/UserList';
 
 const cookies = new Cookies();
 
@@ -25,7 +25,6 @@ function App() {
 
   return (
     <BrowserRouter>
-     <ToastContainer />
       <Routes>
         <Route path="/login" element={!isAuthenticated() === false ? <Navigate to="/" replace /> : <Login />} />
         <Route path="/register" element={!isAuthenticated() === false ? <Navigate to="/" replace /> : <Register />} />
