@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.Extensions.Hosting;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api.Entity
 {
@@ -12,6 +13,7 @@ namespace Api.Entity
         public bool ProfilePrivacy { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
         public ICollection<Follow> Followers { get; set; } = new List<Follow>();
         public ICollection<Comments> Comments { get; set; } = new List<Comments>();
         public ICollection<Notification> Notification { get; set; } = new List<Notification>();

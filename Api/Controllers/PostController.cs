@@ -15,7 +15,6 @@ namespace Api.Controllers
             _postService = postService;
         }
 
-
         /// <summary>
         /// get all post
         /// </summary>

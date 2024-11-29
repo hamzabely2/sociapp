@@ -11,18 +11,7 @@ builder.Services.AddDbContext<Context>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ConnectionDB"))
 ));
 
-using (var serviceProvider = builder.Services.BuildServiceProvider())
-{
-    try
-    {
-        var dbContext = serviceProvider.GetRequiredService<Context>();
-        dbContext.Database.CanConnect(); 
-    }
-    catch (Exception ex)
-    {
-        throw new Exception("Erreur de connexion à la base de données. Vérifiez la configuration.", ex);
-    }
-}
+
 
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
