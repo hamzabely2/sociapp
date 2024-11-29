@@ -36,13 +36,11 @@ export default function Login() {
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <ToastContainer />
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Link to="/">
           <img
             className="mx-auto h-[180px] w-auto"
             src="/img/logo.png"
             alt="Pot Shop"
           />
-        </Link>
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           Se connecter
         </h2>

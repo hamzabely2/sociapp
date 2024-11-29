@@ -48,7 +48,6 @@ export default function PostUser() {
 
     try {
       const data = await createPost(formData);
-      console.log(data)
       toast.success(data.data.message);
       setIsModalOpen(false);
       const updatedPosts = await getAllUserPosts();
@@ -63,7 +62,7 @@ export default function PostUser() {
       const data = await deletePost(postId);
       toast.success(data.data.message);
       const updatedPosts = await getAllUserPosts();
-      setPosts(updatedPosts);
+      setPosts(updatedPosts.data.respose);
     } catch (error) {
       toast.error(error);
     }
@@ -87,11 +86,31 @@ export default function PostUser() {
           >
             {posts.map((post) => (
               <li key={post.id} className="flex flex-col">
-                <img
-                  alt=""
-                  src={post.downloadUrl}
-                  className="aspect-[3/2] w-full rounded-2xl object-cover"
-                />
+                {post.downloadUrl ? (
+  post.downloadUrl.endsWith(".mp4") || 
+  post.downloadUrl.endsWith(".webm") || 
+  post.downloadUrl.endsWith(".ogg") ? (
+    <video
+      controls
+      className="aspect-[3/2] w-full rounded-2xl object-cover"
+    >
+      <source src={post.downloadUrl} type="video/mp4" />
+      Votre navigateur ne supporte pas les vidéos.
+    </video>
+  ) : (
+    <img
+      alt=""
+      src={post.downloadUrl}
+      className="aspect-[3/2] w-full rounded-2xl object-cover"
+    />
+  )
+) : (
+  <img
+    alt="Contenu indisponible"
+    src="URL_DE_L_IMAGE_PAR_DÉFAUT"
+    className="aspect-[3/2] w-full rounded-2xl object-cover"
+  />
+)}
                 <h3 className="mt-6 text-lg font-semibold tracking-tight text-gray-900">
                   {post.title}
                 </h3>
