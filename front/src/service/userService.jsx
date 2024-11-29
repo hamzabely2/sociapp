@@ -7,6 +7,7 @@ export const getAllUsers = async () => {
     const response = await axios.get(`${process.env.REACT_APP_URL}user/get-all-users`);
     return response; 
   } catch (error) {
+    
     throw error; 
   }
 };
