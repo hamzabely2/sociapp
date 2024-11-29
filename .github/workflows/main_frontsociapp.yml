@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'front/**'
   workflow_dispatch:
 
 jobs:
@@ -21,11 +19,10 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: '18.x'
 
       - name: npm install, build, and test
         run: |
-          cd front
           npm install
           npm run build --if-present
           npm run test --if-present
@@ -60,9 +57,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E787C73774F449CB98A417A925806C75 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_18766C9A1CC74984859CF7031C2E6CEB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1D8C265F9BCA4B89BE1A9E142796F596 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EE11CF6BB2E9409FB0E39ED31ECEDC14 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_58CAB3A95A7F44769590FFE5D8DD8628 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_2EDD0602F66B416783904A31FC21AE20 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
