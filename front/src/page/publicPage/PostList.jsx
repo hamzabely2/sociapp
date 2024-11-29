@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getFollowedPosts } from "../../service/postService";
 
+
 export default function PostList() {
   const [posts, setPosts] = useState([]);
 
