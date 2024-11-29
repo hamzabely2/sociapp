@@ -1,8 +1,8 @@
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
+const token = cookies.get("token");
 
-
-export function decodeToken(token) {
+export function decodeToken() {
     try {
         if(token === null)
             return null;
@@ -15,7 +15,7 @@ export function decodeToken(token) {
     }
 }
 
-export const setCookie = (token) => {
+export const setCookie = () => {
     const name = "token"
     const date = new Date();
     date.setTime(date.getTime() + (2 * 60 * 60 * 1000));
@@ -29,7 +29,7 @@ export function isAuthenticated() {
 }
 
 export function getNameFromToken() {
-    const token = cookies.get("token");
+    
     const tokenData = decodeToken(token);
     if (tokenData && tokenData.hasOwnProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")) {
         return tokenData["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
