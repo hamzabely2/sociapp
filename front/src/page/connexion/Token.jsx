@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 const token = cookies.get("token");
 
-export function decodeToken() {
+export function decodeToken(token) {
     try {
         if(token === null)
             return null;
@@ -15,7 +15,7 @@ export function decodeToken() {
     }
 }
 
-export const setCookie = () => {
+export const setCookie = (token) => {
     const name = "token"
     const date = new Date();
     date.setTime(date.getTime() + (2 * 60 * 60 * 1000));
