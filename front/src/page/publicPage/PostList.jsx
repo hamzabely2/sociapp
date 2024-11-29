@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getFollowedPosts } from "../../service/postService";
 
@@ -27,10 +27,7 @@ export default function PostList() {
       ) : (
         <div className="bg-white py-24 sm:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">  
-            <ul
-              role="list"
-              className="mx-auto mt-20 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3"
-            >
+            <ul className="mx-auto mt-20 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
               {posts.map((post) => (
                 <li key={post.id} className="flex flex-col">
                   <img
@@ -62,4 +59,4 @@ export default function PostList() {
       )}
     </>
   );
-}  
+}

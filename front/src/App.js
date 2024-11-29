@@ -4,7 +4,6 @@ import Cookies from 'universal-cookie';
 import NoPage from '../src/page/components/NoPage';
 import Login from './page/connexion/Login';
 import Register from './page/connexion/Register';
-import {  ToastContainer } from 'react-toastify';
 import FollowList from './page/userPage/FollowList';
 import PostList from './page/publicPage/PostList';
 import PostUser from './page/userPage/PostUser';
