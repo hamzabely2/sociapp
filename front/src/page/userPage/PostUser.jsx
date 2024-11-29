@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAllUserPosts, createPost, deletePost } from "../../service/postService";
 
+
 export default function PostUser() {
   const [posts, setPosts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
