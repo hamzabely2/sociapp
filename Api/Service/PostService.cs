@@ -12,6 +12,7 @@ namespace Api.Services
         Task<Post> CreatePostAsync(Post post);
         Task<Post> DeletePostAsync(int postId);
         Task<List<Post>> GetAllPostsUserAsync();
+        Task<Post> UpdatePostAsync(int postId, Post post);
     }
 
     public class PostService : IPostService
@@ -105,9 +106,8 @@ namespace Api.Services
         public async Task<Post> CreatePostAsync(Post post)
         {
             var userInfo = _connectionService.GetCurrentUserInfo();
-            
 
-            if (userInfo.Id == 0)
+            if (_connectionService.GetCurrentUserInfo().Id == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             var file = post.MediaUrl;
@@ -126,7 +126,6 @@ namespace Api.Services
                 if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
                     throw new ArgumentException("L'action a échoué : Type de fichier invalide.");
 
-                // Ajout du fichier dans le stockage
                 var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
                 string containerName = "";
                 if (file.ContentType.StartsWith("image/"))
@@ -169,6 +168,89 @@ namespace Api.Services
 
             return post;
         }
+
+        /// <summary>
+        /// update post
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        public async Task<Post> UpdatePostAsync(int postId, Post post)
+        {
+            var userInfo = _connectionService.GetCurrentUserInfo();
+
+            if (userInfo.Id == 0)
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
+
+            // Récupérer le post existant
+            var existingPost = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (existingPost == null)
+                throw new ArgumentException("Le post spécifié n'existe pas");
+
+            if (existingPost.UserId != userInfo.Id)
+                throw new UnauthorizedAccessException("Vous ne pouvez modifier que vos propres posts");
+
+            var file = post.MediaUrl;
+
+            // Mettre à jour les  du post
+            existingPost.Title = post.Title ?? existingPost.Title;
+            existingPost.Type = post.Type ?? existingPost.Type;
+            existingPost.UpdateDate = DateTime.Now;
+
+            if (file != null && file.Length > 0)
+            {
+                if (!file.ContentType.StartsWith("image/") && !file.ContentType.StartsWith("video/"))
+                    throw new ArgumentException("L'action a échoué : Type de fichier invalide.");
+
+                var blobServiceClient = new BlobServiceClient(_configuration["AzureStorage:ConnectionString"]);
+                string containerName = "";
+
+                if (file.ContentType.StartsWith("image/"))
+                {
+                    containerName = "image";
+                }
+                else if (file.ContentType.StartsWith("video/"))
+                {
+                    containerName = "video";
+                }
+
+                var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+                // Générer un nouveau nom pour le fichier
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                var blobClient = containerClient.GetBlobClient(fileName);
+
+                using (var stream = file.OpenReadStream())
+                {
+                    await blobClient.UploadAsync(stream);
+                }
+
+                existingPost.DownloadUrl = blobClient.Uri.ToString();
+            }
+
+            _context.Posts.Update(existingPost);
+            await _context.SaveChangesAsync();
+
+            var followers = await _context.Follows
+                .Where(f => f.FollowUserId == userInfo.Id)
+                .ToListAsync();
+
+            var notifications = followers.Select(follower => new Notification
+            {
+                Message = $"{userInfo.UserName} a mis à jour un post.",
+                UserId = follower.UserId,
+                CreateDate = DateTime.Now,
+                UpdateDate = DateTime.Now,
+            }).ToList();
+
+            // Ici vous pourriez envoyer les notifications (facultatif selon votre implémentation)
+
+            return existingPost;
+        }
+
+
+
 
 
         /// <summary>

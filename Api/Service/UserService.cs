@@ -16,20 +16,13 @@ namespace Api.Service
     }
     public class UserService : IUserService
     {
-        private readonly string _connectionString;
-        private readonly string _containerName;
-        private readonly string _accountKey;
         private readonly IConnectionService _connectionService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Context _context;
-        private readonly IConfiguration _configuration;
 
-        public UserService(Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public UserService(Context context, IConnectionService connectionService)
         {
             _context = context;
             _connectionService = connectionService;
-            _httpContextAccessor = httpContextAccessor;
-            _configuration = configuration;
         }
 
         /// <summary>

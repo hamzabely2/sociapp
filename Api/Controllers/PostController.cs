@@ -90,6 +90,28 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// create post
+        /// </summary>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        [HttpPut("update-post/{postId}")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Post>> UpdatePost(int postId, Post post)
+        {
+            try
+            {
+                var response = await _postService.UpdatePostAsync(postId, post);
+                string message = "Le post a été ajouté avec succès";
+                return Ok(new { message, response });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
 
         /// <summary>
         /// delete post

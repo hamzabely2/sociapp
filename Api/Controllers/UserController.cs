@@ -21,7 +21,7 @@ namespace Api.Controllers
         ///get user,
         /// </summary>
         /// <returns></returns>
-        [HttpGet("get")]
+        [HttpGet("get-user")]
         public async Task<ActionResult<List<User>>> GetUser()
         {
             try
@@ -98,7 +98,7 @@ namespace Api.Controllers
             /// update user
             /// </summary>
             /// <returns></returns>
-            [HttpPut("update")]
+            [HttpPut("update-user")]
             [Authorize()]
 
             public async Task<ActionResult<string>> UpdateUser(bool profilePrivacy)
