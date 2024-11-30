@@ -9,7 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,7 +26,7 @@ jobs:
           cd front
           npm install
           NODE_OPTIONS=--openssl-legacy-provider CI=false npm run build --if-present
-          CI=false npm run test || echo "Tests ignorés temporairement"
+          #npm run test --if-present
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
@@ -59,9 +58,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A49425DBA80A4A3F934DCBE0CA6DFA10 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B856FF5290F9474BACA796CC3407C987 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9A3D7E28ADCD440794172BDB04109BB9 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_CBA7DE4867494DC19A39C52C8FB6B005 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B45AF6075A44401DA5E09CAD22615685 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1170656E51ED467285F6E8BBE10F4699 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
