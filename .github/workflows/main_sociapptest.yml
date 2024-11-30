@@ -28,7 +28,7 @@ jobs:
         working-directory: ./front
         run: |
           npm install
-          npm run build --if-present
+          NODE_OPTIONS=--openssl-legacy-provider CI=false npm run build --if-present
 
       # Zip the build folder for deployment
       - name: Zip artifact for deployment
