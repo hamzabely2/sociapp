@@ -25,9 +25,9 @@ namespace Api.Controllers
         {
             try
             {
-                Comments respose = await _commentService.CreateCommentsAsync(comment, postId);
+                Comments response = await _commentService.CreateCommentsAsync(comment, postId);
                 string message = "comments a été ajoutée avec succès";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -46,9 +46,9 @@ namespace Api.Controllers
         {
             try
             {
-                Comments respose = await _commentService.DeleteCommentsAsync(commentId);
+                Comments response = await _commentService.DeleteCommentsAsync(commentId);
                 string message = "comments a été supprime avec succès";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
 
             }
             catch (Exception ex)

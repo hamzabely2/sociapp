@@ -24,9 +24,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _postService.GetAllPostsUserAsync();
+                var response = await _postService.GetAllPostsUserAsync();
                 string message = "List post ";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -43,9 +43,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _postService.GetAllPostsAsync();
+                var response = await _postService.GetAllPostsAsync();
                 string message = "List post";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -80,9 +80,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _postService.CreatePostAsync(post);
+                var response = await _postService.CreatePostAsync(post);
                 string message = "Le post a été ajouté avec succès";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -101,9 +101,9 @@ namespace Api.Controllers
         {
             try
             {
-                Post respose = await _postService.DeletePostAsync(postId);
+                Post response = await _postService.DeletePostAsync(postId);
                 string message = "le post a été supprime avec succès";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {

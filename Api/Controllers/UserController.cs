@@ -1,6 +1,7 @@
 ﻿using Api.Entity;
 using Api.Model.DTO;
 using Api.Service;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,9 +26,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _userService.GetUserAsync();
+                var response = await _userService.GetUserAsync();
                 string message = "utilisateur";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -44,9 +45,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _userService.GetAllUsersAsync();
+                var response = await _userService.GetAllUsersAsync();
                 string message = "list utilisateur";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -64,9 +65,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _userService.LoginAsync(user);
+                var response = await _userService.LoginAsync(user);
                 string message = "le token a été cree avec succès";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -83,9 +84,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _userService.RegisterAsync(user);
+                var response = await _userService.RegisterAsync(user);
                 string message = "le utilisateur a été cree avec succès";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -104,9 +105,9 @@ namespace Api.Controllers
             {
                 try
                 {
-                    var respose = await _userService.UpdateUserAsync(profilePrivacy);
+                    var response = await _userService.UpdateUserAsync(profilePrivacy);
                     string message = "";
-                    return Ok(new { message, respose });
+                    return Ok(new { message, response });
                 }
                 catch (Exception ex)
                 {

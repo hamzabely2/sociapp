@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
+
     public class NotificationController : ControllerBase
     {
         private readonly INotificationService _notificationService;
@@ -20,9 +23,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _notificationService.GetNotificationsAsync();
+                var response = await _notificationService.GetNotificationsAsync();
                 string message = "List notifications";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
@@ -39,9 +42,9 @@ namespace Api.Controllers
         {
             try
             {
-                var respose = await _notificationService.DeleteNotificationAsync(notificationId);
+                var response = await _notificationService.DeleteNotificationAsync(notificationId);
                 string message = "La notification a été supprimée avec succès.";
-                return Ok(new { message, respose });
+                return Ok(new { message, response });
             }
             catch (Exception ex)
             {
