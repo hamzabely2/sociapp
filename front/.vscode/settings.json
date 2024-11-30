@@ -1,4 +1,8 @@
 {
     "appService.defaultWebAppToDeploy": "undefined/subscriptions/eb10ec54-cd75-4a07-89a3-cc597b358808/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/frontsociapp",
-    "appService.deploySubpath": "."
+    "appService.deploySubpath": ".",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ]
 }

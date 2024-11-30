@@ -6,7 +6,7 @@ import Cookies from "universal-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchNotifications, deleteNotification } from "../../service/notificationService";
-import { getUser, updateUserProfile } from '../../service/userService'; // Ajout de updateUserProfile
+import { getUser, updateUserProfile } from '../../service/userService'; 
 const navigation = [
   { name: "Post", href: "/", current: true },
   { name: "Utilisateur", href: "/user", current: false },
@@ -69,8 +69,7 @@ export default function NavBar() {
 
   const handleSaveSettings = async () => {
     try {
-      // Appel à la fonction du backend pour mettre à jour les paramètres du profil
-      await updateUserProfile({ isProfilePrivate });
+      await updateUserProfile(isProfilePrivate );
       toast.success("Paramètres enregistrés !");
       setIsSettingsModalOpen(false);
     } catch (error) {

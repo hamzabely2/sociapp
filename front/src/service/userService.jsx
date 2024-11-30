@@ -25,10 +25,18 @@ export const getAllUsers = async () => {
   }
 }
 
-export const updateUserProfile = async () => {
+export const updateUserProfile = async (userData) => {
   try {
-    const response = await axios.put(`${process.env.REACT_APP_URL}user/update-user`);
-    return response; 
+    const response = await axios.put(
+      `${process.env.REACT_APP_URL}user/update-user`, 
+      userData, 
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.get("token")}`, 
+        },
+      }
+    );
+    return response;
   } catch (error) {
     throw error; 
   }
