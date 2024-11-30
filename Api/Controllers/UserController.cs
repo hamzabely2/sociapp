@@ -106,7 +106,7 @@ namespace Api.Controllers
                 try
                 {
                     var response = await _userService.UpdateUserAsync(profilePrivacy);
-                    string message = "";
+                    string message = "la modification du profil a réussi";
                     return Ok(new { message, response });
                 }
                 catch (Exception ex)
