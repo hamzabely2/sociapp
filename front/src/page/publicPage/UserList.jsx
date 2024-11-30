@@ -12,7 +12,7 @@ export default function UserList() {
     const fetchUsers = async () => {
       try {
         const data = await getAllUsers(); 
-        setUsers(data.data.respose);
+        setUsers(data.data.response);
       } catch (err) {
         toast.error(err);
       }

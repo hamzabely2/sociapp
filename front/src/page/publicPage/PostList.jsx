@@ -12,7 +12,7 @@ export default function PostList() {
     const fetchPosts = async () => {
       try {
         const data = await getFollowedPosts();
-        setPosts(data.data.respose);
+        setPosts(data.data.response);
       } catch (error) {
         toast.error(error);
       }

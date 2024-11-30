@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Disclosure, Menu } from "@headlessui/react";
+import { Disclosure, Menu, Dialog } from "@headlessui/react";
 import { BellIcon } from "@heroicons/react/24/outline";
-import { Link , useNavigate  } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { fetchNotifications, deleteNotification } from "../../service/notificationService";
+import axios from "axios";
 
 const navigation = [
   { name: "Post", href: "/", current: true },
@@ -21,8 +22,8 @@ export default function NavBar() {
   const cookies = new Cookies();
   const [user, setUser] = useState([]);
   const navigate = useNavigate();
-
- 
+  const [notifications, setNotifications] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -35,21 +36,42 @@ export default function NavBar() {
             },
           }
         );
-        setUser(response.data.respose);
+        setUser(response.data.response);
       } catch (error) {
-        toast.error(error);
+        toast.error("Erreur lors de la récupération de l'utilisateur.");
       }
     };
 
     fetchUser();
   }, []);
 
-  const handleDeconnexion = ( ) =>{
-      cookies.remove('token');
-      navigate('/login');
-      window.location.reload();
-  }
-  
+  const handleDeconnexion = () => {
+    cookies.remove("token");
+    navigate("/login");
+    window.location.reload();
+  };
+
+  const loadNotifications = async () => {
+    try {
+      const data = await fetchNotifications(); 
+      setNotifications(data.data.response);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleDeleteNotification = async (id) => {
+    try {
+      await deleteNotification(id); 
+      toast.success("Notification supprimée !");
+      setNotifications((prev) =>
+        prev.filter((notification) => notification.id !== id)
+      );
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
     <>
       <div className="min-h-full">
@@ -74,8 +96,8 @@ export default function NavBar() {
                           aria-current={item.current ? "page" : undefined}
                           className={classNames(
                             item.current
-                              ? "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center  text-sm font-medium"
-                              : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center  text-sm font-medium",
+                              ? "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center text-sm font-medium"
+                              : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center text-sm font-medium"
                           )}
                         >
                           {item.name}
@@ -87,8 +109,11 @@ export default function NavBar() {
                     <button
                       type="button"
                       className="relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      onClick={() => {
+                        loadNotifications();
+                        setIsModalOpen(true);
+                      }}
                     >
-                      <span className="absolute -inset-1.5" />
                       <span className="sr-only">View notifications</span>
                       <BellIcon aria-hidden="true" className="h-6 w-6" />
                     </button>
@@ -97,13 +122,12 @@ export default function NavBar() {
                     <Menu as="div" className="relative ml-3">
                       <div>
                         <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                          <span className="absolute -inset-1.5" />
                           <span className="sr-only">Open user menu</span>
                           <p className="text-gray-900">{user.userName}</p>
                         </Menu.Button>
                       </div>
                       <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <Menu.Item >
+                        <Menu.Item>
                           {({ active }) => (
                             <Link
                               to="/postuser"
@@ -116,7 +140,7 @@ export default function NavBar() {
                             </Link>
                           )}
                         </Menu.Item>
-                        <Menu.Item >
+                        <Menu.Item>
                           {({ active }) => (
                             <Link
                               to="/"
@@ -125,11 +149,11 @@ export default function NavBar() {
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
-                              setting
+                              Settings
                             </Link>
                           )}
                         </Menu.Item>
-                        <Menu.Item >
+                        <Menu.Item>
                           {({ active }) => (
                             <button
                               onClick={handleDeconnexion}
@@ -138,7 +162,7 @@ export default function NavBar() {
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
-                              Déconexion
+                              Déconnexion
                             </button>
                           )}
                         </Menu.Item>
@@ -147,31 +171,52 @@ export default function NavBar() {
                   </div>
                 </div>
               </div>
-
-              <Disclosure.Panel className="sm:hidden">
-                <div className="space-y-1 pb-3 pt-2">
-                  {navigation.map((item) => (
-                    <Disclosure.Button
-                      key={item.name}
-                      as={Link}
-                      to={item.href}
-                      aria-current={item.current ? "page" : undefined}
-                      className={classNames(
-                        item.current
-                          ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                          : "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800",
-                        "block border-l-4 py-2 pl-3 pr-4 text-base font-medium"
-                      )}
-                    >
-                      {item.name}
-                    </Disclosure.Button>
-                  ))}
-                </div>     
-              </Disclosure.Panel>
             </>
           )}
         </Disclosure>
       </div>
+
+      {/* Modal for notifications */}
+      <Dialog
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        className="relative z-10"
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+            <Dialog.Title className="text-lg font-medium leading-6 text-gray-900">
+              Notifications
+            </Dialog.Title>
+            <div className="mt-4">
+              {notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className="flex items-center justify-between p-2 border-b"
+                  >
+                    <p>{notification.message}</p>
+                    <button
+                      onClick={() => handleDeleteNotification(notification.id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">Aucune notification.</p>
+              )}
+            </div>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-4 w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Fermer
+            </button>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </>
   );
 }

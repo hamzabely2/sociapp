@@ -20,7 +20,7 @@ export default function PostUser() {
       try {
         const data = await getAllUserPosts();
         console.log(data)
-        setPosts(data.data.respose);
+        setPosts(data.data.response);
       } catch (error) {
         toast.error(error);
       }
@@ -52,7 +52,7 @@ export default function PostUser() {
       toast.success(data.data.message);
       setIsModalOpen(false);
       const updatedPosts = await getAllUserPosts();
-      setPosts(updatedPosts.data.respose);
+      setPosts(updatedPosts.data.response);
     } catch (error) {
       toast.error(error);
     }
@@ -63,7 +63,7 @@ export default function PostUser() {
       const data = await deletePost(postId);
       toast.success(data.data.message);
       const updatedPosts = await getAllUserPosts();
-      setPosts(updatedPosts.data.respose);
+      setPosts(updatedPosts.data.response);
     } catch (error) {
       toast.error(error);
     }
