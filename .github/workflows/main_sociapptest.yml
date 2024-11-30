@@ -28,7 +28,7 @@ jobs:
         working-directory: ./front # Navigate to the 'front' folder
         run: |
           npm install
-          npm run build --if-present
+           NODE_OPTIONS=--openssl-legacy-provider CI=false npm run build --if-present
           # Uncomment below if you want to run tests
           # npm run test --if-present
 
