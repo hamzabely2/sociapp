@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllUserPosts, createPost, deletePost } from "../../service/postService";
-
+import { getAllUserPosts, createPost, deletePost, updatePost } from "../../service/postService";
 
 export default function PostUser() {
   const [posts, setPosts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPostId, setEditingPostId] = useState(null);
   const [payload, setPayload] = useState({
     title: "",
     type: "",
@@ -19,7 +20,7 @@ export default function PostUser() {
     const fetchPosts = async () => {
       try {
         const data = await getAllUserPosts();
-        console.log(data)
+        console.log(data);
         setPosts(data.data.response);
       } catch (error) {
         toast.error(error);
@@ -58,6 +59,42 @@ export default function PostUser() {
     }
   };
 
+  const handleEditPost = async (post) => {
+    setIsEditMode(true);
+    setIsModalOpen(true);
+    setEditingPostId(post.id);
+    setPayload({
+      title: post.title,
+      type: post.type,
+      downloadUrl: post.downloadUrl,
+      mediaUrl: null, // We don't preload the file input
+    });
+  };
+
+  const handleUpdatePost = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", payload.title);
+    formData.append("type", payload.type);
+    formData.append("downloadUrl", payload.downloadUrl);
+    if (payload.mediaUrl) {
+      formData.append("MediaUrl", payload.mediaUrl);
+    }
+
+    try {
+      const data = await updatePost(editingPostId, formData);
+      toast.success(data.data.message);
+      setIsModalOpen(false);
+      setIsEditMode(false);
+      setEditingPostId(null);
+      const updatedPosts = await getAllUserPosts();
+      setPosts(updatedPosts.data.response);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   const handleDeletePost = async (postId) => {
     try {
       const data = await deletePost(postId);
@@ -77,7 +114,16 @@ export default function PostUser() {
           <button
             type="button"
             className="mb-5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 m-2"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              setIsEditMode(false);
+              setPayload({
+                title: "",
+                type: "",
+                downloadUrl: "defaultDownloadUrl",
+                mediaUrl: null,
+              });
+            }}
           >
             Créer un post
           </button>
@@ -88,30 +134,30 @@ export default function PostUser() {
             {posts.map((post) => (
               <li key={post.id} className="flex flex-col">
                 {post.downloadUrl ? (
-  post.downloadUrl.endsWith(".mp4") || 
-  post.downloadUrl.endsWith(".webm") || 
-  post.downloadUrl.endsWith(".ogg") ? (
-    <video
-      controls
-      className="aspect-[3/2] w-full rounded-2xl object-cover"
-    >
-      <source src={post.downloadUrl} type="video/mp4" />
-      Votre navigateur ne supporte pas les vidéos.
-    </video>
-  ) : (
-    <img
-      alt=""
-      src={post.downloadUrl}
-      className="aspect-[3/2] w-full rounded-2xl object-cover"
-    />
-  )
-) : (
-  <img
-    alt="Contenu indisponible"
-    src="URL_DE_L_IMAGE_PAR_DÉFAUT"
-    className="aspect-[3/2] w-full rounded-2xl object-cover"
-  />
-)}
+                  post.downloadUrl.endsWith(".mp4") || 
+                  post.downloadUrl.endsWith(".webm") || 
+                  post.downloadUrl.endsWith(".ogg") ? (
+                    <video
+                      controls
+                      className="aspect-[3/2] w-full rounded-2xl object-cover"
+                    >
+                      <source src={post.downloadUrl} type="video/mp4" />
+                      Votre navigateur ne supporte pas les vidéos.
+                    </video>
+                  ) : (
+                    <img
+                      alt=""
+                      src={post.downloadUrl}
+                      className="aspect-[3/2] w-full rounded-2xl object-cover"
+                    />
+                  )
+                ) : (
+                  <img
+                    alt="Contenu indisponible"
+                    src="URL_DE_L_IMAGE_PAR_DÉFAUT"
+                    className="aspect-[3/2] w-full rounded-2xl object-cover"
+                  />
+                )}
                 <h3 className="mt-6 text-lg font-semibold tracking-tight text-gray-900">
                   {post.title}
                 </h3>
@@ -128,6 +174,12 @@ export default function PostUser() {
                     Télécharger
                   </a>
                   <button
+                    onClick={() => handleEditPost(post)}
+                    className="mr-1 rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400"
+                  >
+                    Modifier
+                  </button>
+                  <button
                     onClick={() => handleDeletePost(post.id)}
                     className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
                   >
@@ -142,8 +194,13 @@ export default function PostUser() {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Créer un post</h3>
-            <form className="space-y-4" onSubmit={handleCreatePost}>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              {isEditMode ? "Modifier le post" : "Créer un post"}
+            </h3>
+            <form
+              className="space-y-4"
+              onSubmit={isEditMode ? handleUpdatePost : handleCreatePost}
+            >
               <input
                 type="text"
                 name="title"
@@ -180,7 +237,7 @@ export default function PostUser() {
                   type="submit"
                   className="bg-indigo-600 text-white px-4 py-2 rounded-md"
                 >
-                  Créer
+                  {isEditMode ? "Modifier" : "Créer"}
                 </button>
               </div>
             </form>

@@ -2,11 +2,10 @@ import axios from "axios";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
-const API_URL = process.env.REACT_APP_URL;
 
 export const getFollowedPosts = async () => {
   try {
-    const response = await axios.get(`${API_URL}post/get-follow-posts`, {
+    const response = await axios.get(`${process.env.REACT_APP_URL}post/get-follow-posts`, {
       headers: {
         Authorization: `Bearer ${cookies.get("token")}`,
       },
@@ -45,9 +44,24 @@ export const createPost = async (formData) => {
   }
 };
 
+export const updatePost = async (PostId, formData) => {
+  try {
+    const response = await axios.put(`${process.env.REACT_APP_URL}post/update-post/${PostId}`, formData, {
+      headers: {
+        Authorization: `Bearer ${cookies.get("token")}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export const deletePost = async (postId) => {
   try {
-    const response = await axios.delete(`${API_URL}post/delete-post/${postId}`, {
+    const response = await axios.delete(`${process.env.REACT_APP_URL}post/delete-post/${postId}`, {
       headers: {
         Authorization: `Bearer ${cookies.get("token")}`,
       },

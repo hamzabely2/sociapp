@@ -27,7 +27,7 @@ export default function Register() {
       );
       if (response.status === 200) {
         toast.success(response.data.message || 'Inscription réussie !');
-        setCookie(response.data.respose);
+        setCookie(response.data.response);
         navigate('/');
       } else {
         toast.warning("L'action a échoué.");

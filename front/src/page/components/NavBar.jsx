@@ -6,8 +6,7 @@ import Cookies from "universal-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchNotifications, deleteNotification } from "../../service/notificationService";
-import axios from "axios";
-
+import { getUser, updateUserProfile } from '../../service/userService'; // Ajout de updateUserProfile
 const navigation = [
   { name: "Post", href: "/", current: true },
   { name: "Utilisateur", href: "/user", current: false },
@@ -24,19 +23,15 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);  // Etat du modal de paramètres
+  const [isProfilePrivate, setIsProfilePrivate] = useState(false); // Etat de la confidentialité du profil
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_URL}user/get`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies.get("token")}`,
-            },
-          }
-        );
-        setUser(response.data.response);
+        const data = await getUser(); 
+        setUser(data.data.response);
+        setIsProfilePrivate(data.data.response.isProfilePrivate);  // Initialiser avec l'état actuel du profil
       } catch (error) {
         toast.error("Erreur lors de la récupération de l'utilisateur.");
       }
@@ -69,6 +64,17 @@ export default function NavBar() {
       );
     } catch (error) {
       toast.error(error.message);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      // Appel à la fonction du backend pour mettre à jour les paramètres du profil
+      await updateUserProfile({ isProfilePrivate });
+      toast.success("Paramètres enregistrés !");
+      setIsSettingsModalOpen(false);
+    } catch (error) {
+      toast.error("Erreur lors de la mise à jour des paramètres.");
     }
   };
 
@@ -142,15 +148,15 @@ export default function NavBar() {
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (
-                            <Link
-                              to="/"
+                            <button
+                              onClick={() => setIsSettingsModalOpen(true)} // Ouvre le modal des paramètres
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
                               Settings
-                            </Link>
+                            </button>
                           )}
                         </Menu.Item>
                         <Menu.Item>
@@ -213,6 +219,45 @@ export default function NavBar() {
               className="mt-4 w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
               Fermer
+            </button>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
+      {/* Modal for settings */}
+      <Dialog
+        open={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        className="relative z-10"
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+            <Dialog.Title className="text-lg font-medium leading-6 text-gray-900">
+              Paramètres du Profil
+            </Dialog.Title>
+            <div className="mt-4">
+              <div className="flex items-center justify-between">
+                <p>Profil privé</p>
+                <input
+                  type="checkbox"
+                  checked={isProfilePrivate}
+                  onChange={() => setIsProfilePrivate(!isProfilePrivate)} // Changer l'état du profil privé
+                  className="h-5 w-5"
+                />
+              </div>
+            </div>
+            <button
+              onClick={handleSaveSettings} // Enregistrer les paramètres
+              className="mt-4 w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Sauvegarder
+            </button>
+            <button
+              onClick={() => setIsSettingsModalOpen(false)} // Fermer le modal
+              className="mt-2 w-full inline-flex justify-center rounded-md bg-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-400"
+            >
+              Annuler
             </button>
           </Dialog.Panel>
         </div>

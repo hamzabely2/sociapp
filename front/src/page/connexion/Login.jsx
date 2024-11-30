@@ -21,7 +21,7 @@ export default function Login() {
         data
       );
       if (response.status === 200) {
-        setCookie(response.data.respose);
+        setCookie(response.data.response);
         toast.success(response.data.message);
         navigate('/');
       } else {
