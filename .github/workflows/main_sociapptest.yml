@@ -25,17 +25,15 @@ jobs:
 
       # Install dependencies and build the front-end
       - name: npm install, build, and test
-        working-directory: ./front # Navigate to the 'front' folder
+        working-directory: ./front
         run: |
           npm install
-           NODE_OPTIONS=--openssl-legacy-provider CI=false npm run build --if-present
-          # Uncomment below if you want to run tests
-          # npm run test --if-present
+          npm run build --if-present
 
       # Zip the build folder for deployment
       - name: Zip artifact for deployment
         working-directory: ./front/build
-        run: zip -r ../../release.zip . # Zip only the build folder's content
+        run: zip -r ../../release.zip .
 
       # Upload the zipped artifact for the deploy job
       - name: Upload artifact for deployment job
@@ -79,4 +77,4 @@ jobs:
         with:
           app-name: 'sociapptest'
           slot-name: 'Production'
-          package: ./build
+          package: ./ # Deploy from the current directory
