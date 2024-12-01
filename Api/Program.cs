@@ -1,18 +1,20 @@
 using Api.Service;
 using Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ajoutez votre DbContext avant de construire l'application
+// Ajoutez le DbContext
 builder.Services.AddDbContext<Context>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("ConnectionDB"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ConnectionDB"))
-));
+    ));
 
-
-
+// Ajout des services
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
@@ -25,35 +27,54 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
+// Configuration de l'authentification JWT
+var validAudience = builder.Configuration["JWT:ValidAudience"];
+var validIssuer = builder.Configuration["JWT:ValidIssuer"];
+var secret = builder.Configuration["JWT:Secret"];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false; // Activer HTTPS en production
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = validAudience,
+        ValidIssuer = validIssuer,
+        ClockSkew = TimeSpan.Zero,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+    };
+});
+
+// Configuration CORS
 var reactApp = builder.Configuration["Cors:Url"];
-
-string[] origins = new string[] { reactApp };
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
         "ReactLocal",
-      policy => policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod()
+        policy => policy.WithOrigins(reactApp).AllowAnyHeader().AllowAnyMethod()
     );
 });
 
 var app = builder.Build();
-//if (app.Environment.IsDevelopment())
-//{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-//}
 
-builder.Configuration.AddEnvironmentVariables();
+// Swagger
+app.UseSwagger();
+app.UseSwaggerUI();
 
-//app.UseHttpsRedirection();
-builder.Services.AddHttpContextAccessor();
-
-app.UseAuthorization();
+// Ajout des middlewares dans le bon ordre
 app.UseCors("ReactLocal");
-app.UseCookiePolicy();
 app.UseAuthentication();
+app.UseAuthorization();
 
+// Ajout des contrôleurs
 app.MapControllers();
 
 app.Run();

@@ -1,11 +1,12 @@
 ﻿using Api.Service;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize()]
 
     public class NotificationController : ControllerBase
     {
@@ -14,11 +15,12 @@ namespace Api.Controllers
         {
             _notificationService = notificationService;
         }
+
             /// <summary>
             /// Récupérer toutes les notifications d'un utilisateur
             /// </summary>
             /// <param name="userId"></param>
-            [HttpGet("get-notifications")]
+        [HttpGet("get-notifications")]
         public async Task<IActionResult> GetNotifications()
         {
             try

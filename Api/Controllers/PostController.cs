@@ -1,12 +1,13 @@
 ﻿using Api.Services;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize()]
+    [Authorize()]
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;                                                                

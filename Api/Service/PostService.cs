@@ -154,17 +154,23 @@ namespace Api.Services
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
 
+            // Récupérer les followers de l'utilisateur qui publie le post
             var followers = await _context.Follows
-            .Where(f => f.FollowUserId == userInfo.Id)
-            .ToListAsync();
+                .Where(f => f.FollowUserId == userInfo.Id)
+                .ToListAsync();
 
+            // Créer des notifications pour chaque follower
             var notifications = followers.Select(follower => new Notification
             {
-                Message = $"{userInfo.UserName} a publié un nouveau post.",
+                Message = $"{userInfo.UserName} a : publié un nouveau post.",
                 UserId = follower.UserId,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
             }).ToList();
+
+            // Ajouter les notifications à la base de données
+            await _context.Notifications.AddRangeAsync(notifications);
+            await _context.SaveChangesAsync();
 
             return post;
         }

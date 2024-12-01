@@ -7,18 +7,21 @@ namespace Api.Service
     public interface IFollowService
     {
         Task<List<User>> GetFollowedUsersAsync();
-        Task<string> FollowUserAsync(int userIdFollowed);
+        Task<string> FollowUserAsync(int userIdFollowed, int userId);
         Task<string> UnFollowUserAsync(int userIdFollowed);
     }
         public class FollowService : IFollowService
          {
         private readonly IConnectionService _connectionService;
         private readonly Context _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FollowService(Context context, IConnectionService connectionService)
+
+        public FollowService(Context context, IConnectionService connectionService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _connectionService = connectionService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -49,7 +52,7 @@ namespace Api.Service
         }
 
 
-        public async Task<string> FollowUserAsync(int userIdFollowed)
+        public async Task<string> FollowUserAsync(int userIdFollowed, int userId)
         {
             var userInfo = _connectionService.GetCurrentUserInfo();
             if (userInfo.Id == 0)
@@ -80,33 +83,26 @@ namespace Api.Service
             return "Maintenant, vous suivez cet utilisateur.";
         }
 
-        /// <summary>
-        /// unnfollow user
-        /// </summary>
-        /// <param name="userIdFollowed"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task<string> UnFollowUserAsync(int userIdFollowed)
         {
             var userInfo = _connectionService.GetCurrentUserInfo();
             if (userInfo.Id == 0)
-                throw new ArgumentException("L'action a échoué : l'utilisateur actuel n'existe pas");
+                throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
-            var userExists = await _context.Users.FindAsync(userIdFollowed).ConfigureAwait(false);
-            if (userExists == null)
-                throw new ArgumentException("L'action a échoué : l'utilisateur à ne plus suivre n'existe pas.");
 
             var followRelation = await _context.Follows
-                .FirstOrDefaultAsync(f => f.Id == userInfo.Id && f.Id == userIdFollowed)
+                .FirstOrDefaultAsync(f => f.UserId == userInfo.Id && f.FollowUserId == userIdFollowed)
                 .ConfigureAwait(false);
 
             if (followRelation == null)
                 throw new ArgumentException("L'action a échoué : vous ne suivez pas cet utilisateur.");
 
             _context.Follows.Remove(followRelation);
+
+            // Sauvegarde les modifications
             await _context.SaveChangesAsync();
 
-            return "Vous ne suivez plus cet utilisateur.";
+            return "vous ne suive plus le utlissateur";
         }
     }
 }

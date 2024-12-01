@@ -1,6 +1,5 @@
-﻿using Api.Service;
-using Azure;
-using Microsoft.AspNetCore.Authorization;
+﻿using Api.Entity;
+using Api.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -21,7 +20,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get-list-followed-users")]
-        public async Task<IActionResult> GetFollowedUsers()
+        public async Task<ActionResult<List<User>>> GetFollowedUsers()
         {
             try
             {
@@ -41,11 +40,11 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("followe-user/{userIdFollowed}")]
-        public async Task<ActionResult<string>> FollowUser(int userIdFollowed)
+        public async Task<ActionResult<string>> FollowUser(int userIdFollowed,int userId)
         {
             try
             {
-                var response = await _followService.FollowUserAsync(userIdFollowed);
+                var response = await _followService.FollowUserAsync(userIdFollowed, userId);
                 string message = "maintenant vous suive cet utilisateur";
                 return Ok(new { message, response });
             }
@@ -56,7 +55,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// unfololow user
+        /// unfollow user
         /// </summary>
         /// <returns></returns>
         [HttpDelete("unfollowe-user/{userIdFollowed}")]
