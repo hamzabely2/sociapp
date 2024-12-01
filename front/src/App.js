@@ -8,7 +8,6 @@ import FollowList from './page/userPage/FollowList';
 import PostList from './page/publicPage/PostList';
 import PostUser from './page/userPage/PostUser';
 import UserList from './page/publicPage/UserList';
-
 const cookies = new Cookies();
 
 function App() {
