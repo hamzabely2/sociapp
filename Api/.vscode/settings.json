@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "bin\\Release\\net8.0\\publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/eb10ec54-cd75-4a07-89a3-cc597b358808/resourceGroups/sociapp/providers/Microsoft.Web/sites/apisociapp"
+}

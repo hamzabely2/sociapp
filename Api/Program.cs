@@ -25,9 +25,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
-var reactApp = builder.Configuration["Cors:url"];
+var reactApp = builder.Configuration["Cors:Url"];
 
-string[] origins = new string[] { reactApp, "http://localhost:3000" };
+string[] origins = new string[] { reactApp };
 
 builder.Services.AddCors(options =>
 {
