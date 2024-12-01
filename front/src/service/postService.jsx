@@ -12,7 +12,7 @@ export const getFollowedPosts = async () => {
     });
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };
 
@@ -26,7 +26,7 @@ export const getAllUserPosts = async () => {
     });
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };
 
@@ -40,7 +40,7 @@ export const createPost = async (formData) => {
     });
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };
 
@@ -54,7 +54,7 @@ export const updatePost = async (PostId, formData) => {
     });
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };
 
@@ -68,6 +68,6 @@ export const deletePost = async (postId) => {
     });
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };

@@ -23,15 +23,15 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);  // Etat du modal de paramètres
-  const [isProfilePrivate, setIsProfilePrivate] = useState(false); // Etat de la confidentialité du profil
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);  
+  const [isProfilePrivate, setIsProfilePrivate] = useState(false); 
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const data = await getUser(); 
         setUser(data.data.response);
-        setIsProfilePrivate(data.data.response.isProfilePrivate);  // Initialiser avec l'état actuel du profil
+        setIsProfilePrivate(data.data.response.isProfilePrivate);
       } catch (error) {
         toast.error("Erreur lors de la récupération de l'utilisateur.");
       }
@@ -122,8 +122,6 @@ export default function NavBar() {
                       <span className="sr-only">View notifications</span>
                       <BellIcon aria-hidden="true" className="h-6 w-6" />
                     </button>
-
-                    {/* Profile dropdown */}
                     <Menu as="div" className="relative ml-3">
                       <div>
                         <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -180,8 +178,6 @@ export default function NavBar() {
           )}
         </Disclosure>
       </div>
-
-      {/* Modal for notifications */}
       <Dialog
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -222,8 +218,6 @@ export default function NavBar() {
           </Dialog.Panel>
         </div>
       </Dialog>
-
-      {/* Modal for settings */}
       <Dialog
         open={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}

@@ -3,9 +3,25 @@ import NavBar from "../components/NavBar";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getFollowedUsers, unfollowUser } from "../../service/followService";
+import { getUser } from "../../service/userService";
 
 export default function FollowList() {
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState([]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await getUser(); 
+        setUser(data.data.response);
+      } catch (error) {
+        toast.error("Erreur lors de la récupération de l'utilisateur.");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -21,7 +37,7 @@ export default function FollowList() {
 
   const handleUnFollow = async (userIdFollowed) => {
     try {
-      const data = await unfollowUser(userIdFollowed);
+      const data = await unfollowUser(userIdFollowed,user.Id);
       toast.success(data.data.message);
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userIdFollowed));
     } catch (error) {

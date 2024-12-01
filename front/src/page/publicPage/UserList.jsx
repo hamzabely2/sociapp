@@ -27,7 +27,7 @@ export default function UserList() {
       if(data.status === 200){
         toast.success(data.data.message);
       }else{
-        toast.error("L'action a echue");
+        toast.error(data.response.data.message);
       }
     } catch (err) {
       toast.error(err);

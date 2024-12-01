@@ -11,26 +11,30 @@ export const getFollowedUsers = async () => {
     });
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };
 
-export const followUser = async (userIdFollowed) => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_URL}follow/followe-user/${userIdFollowed}`,{
-          headers: {
-            Authorization: `Bearer ${cookies.get("token")}`,
-          },
-        }
-      );
-      return response; 
-    } catch (error) {
-      throw error; 
-    }
-  };
+export const followUser = async (userIdFollowed, userId) => {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_URL}follow/followe-user/${userIdFollowed}`,
+      userId, 
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.get("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
 
-export const unfollowUser = async (userIdFollowed) => {
+
+export const unfollowUser = async (userIdFollowed,userId) => {
   try {
     const response = await axios.delete(
       `${process.env.REACT_APP_URL}follow/unfollowe-user/${userIdFollowed}`, {
@@ -41,6 +45,6 @@ export const unfollowUser = async (userIdFollowed) => {
     );
     return response;
   } catch (error) {
-    throw error;
+    throw new Error("Erreur");
   }
 };
