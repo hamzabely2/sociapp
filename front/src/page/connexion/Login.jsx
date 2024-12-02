@@ -12,7 +12,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const data = { email, password };
 
     try {
@@ -20,6 +19,7 @@ export default function Login() {
         `${process.env.REACT_APP_URL}user/login`,
         data
       );
+      console.log(response, "respose")
       if (response.status === 200) {
         setCookie(response.data.response);
         toast.success(response.data.message);
@@ -27,8 +27,9 @@ export default function Login() {
       } else {
         toast.warning("L'action a échoué.");
       }
+      toast.warning("L'action a échoué.");
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message !== "Network Error" ? error.response.data.message : error.message )
     }
   };
 

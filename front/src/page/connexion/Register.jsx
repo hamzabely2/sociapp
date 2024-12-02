@@ -25,6 +25,7 @@ export default function Register() {
         `${process.env.REACT_APP_URL}user/register`,
         data
       );
+      console.log(response)
       if (response.status === 200) {
         toast.success(response.data.message || 'Inscription réussie !');
         setCookie(response.data.response);
@@ -33,7 +34,7 @@ export default function Register() {
         toast.warning("L'action a échoué.");
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message !== "Network Error" ? error.response.data.message : error.message )
     }
   };
 
