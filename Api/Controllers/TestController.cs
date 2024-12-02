@@ -11,7 +11,7 @@ namespace Api.Controllers
         /// test
         /// </summary>
         /// <returns></returns>
-        [HttpGet("test")]
+        [HttpGet("test1")]
         public string Test()
         {
             return "test OK";

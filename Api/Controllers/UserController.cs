@@ -4,6 +4,7 @@ using Api.Service;
 using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
@@ -12,9 +13,13 @@ namespace Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService) {
+
+        public UserController(IUserService userService, ILogger<UserController> logger) 
+        {
             _userService = userService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -43,14 +48,17 @@ namespace Api.Controllers
         [HttpGet("get-all-users")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
+            _logger.LogInformation("{get-all-users} endpoint called.");
             try
             {
                 var response = await _userService.GetAllUsersAsync();
+                _logger.LogDebug("Response received: {Response}", response);
                 string message = "list utilisateur";
                 return Ok(new { message, response });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving data.");
                 return BadRequest(new { message = ex.Message });
             }
         }

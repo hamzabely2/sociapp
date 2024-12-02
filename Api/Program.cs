@@ -3,16 +3,24 @@ using Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging; 
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();   
+builder.Logging.AddEventSourceLogger();
+
+// Configuration de la base de donn�es
 builder.Services.AddDbContext<Context>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("ConnectionDB"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ConnectionDB"))
     ));
 
+// Injection des d�pendances (DI)
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
@@ -61,13 +69,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
 app.UseCors("ReactLocal");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Application d�marr�e avec succ�s.");
+
 
 app.Run();
