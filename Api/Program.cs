@@ -7,14 +7,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ajoutez le DbContext
 builder.Services.AddDbContext<Context>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("ConnectionDB"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ConnectionDB"))
     ));
 
-// Ajout des services
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
@@ -27,7 +25,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
-// Configuration de l'authentification JWT
 var validAudience = builder.Configuration["JWT:ValidAudience"];
 var validIssuer = builder.Configuration["JWT:ValidIssuer"];
 var secret = builder.Configuration["JWT:Secret"];
@@ -53,7 +50,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configuration CORS
 var reactApp = builder.Configuration["Cors:Url"];
 builder.Services.AddCors(options =>
 {
@@ -65,16 +61,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Ajout des middlewares dans le bon ordre
 app.UseCors("ReactLocal");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Ajout des contrôleurs
 app.MapControllers();
 
 app.Run();

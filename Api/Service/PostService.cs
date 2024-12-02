@@ -75,7 +75,7 @@ namespace Api.Services
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             var userPosts = await _context.Posts
-                                            .Where(post => post.UserId == 1)
+                                            .Where(post => post.UserId == userInfo.Id)
                                             .OrderByDescending(post => post.CreateDate)
                                             .ToListAsync();
 
@@ -116,8 +116,6 @@ namespace Api.Services
             post.UpdateDate = DateTime.Now;
             post.UserId = userInfo.Id;
 
-
-            //offline mode
             if (_configuration["AzureStorage:ConnectionString"] != "")
             {
                 if (file == null || file.Length == 0)
@@ -147,19 +145,16 @@ namespace Api.Services
                     await blobClient.UploadAsync(stream);
                 }
 
-                // Stockez l'URL du fichier dans la propriété DownloadUrl
                 post.DownloadUrl = blobClient.Uri.ToString();
             }
 
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
 
-            // Récupérer les followers de l'utilisateur qui publie le post
             var followers = await _context.Follows
                 .Where(f => f.FollowUserId == userInfo.Id)
                 .ToListAsync();
 
-            // Créer des notifications pour chaque follower
             var notifications = followers.Select(follower => new Notification
             {
                 Message = $"{userInfo.UserName} a : publié un nouveau post.",
@@ -168,7 +163,6 @@ namespace Api.Services
                 UpdateDate = DateTime.Now,
             }).ToList();
 
-            // Ajouter les notifications à la base de données
             await _context.Notifications.AddRangeAsync(notifications);
             await _context.SaveChangesAsync();
 
