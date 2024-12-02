@@ -1,0 +1,9 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/eb10ec54-cd75-4a07-89a3-cc597b358808/resourceGroups/sociapp/providers/Microsoft.Web/sites/frontsociapp",
+    "appService.deploySubpath": "front\\build",
+    "appService.showBuildDuringDeployPrompt": false
+}
