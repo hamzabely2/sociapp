@@ -21,6 +21,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get-all-user-posts")]
+        [Authorize()]
         public async Task<ActionResult<List<Post>>> GetAllPostsUser()
         {
             try
@@ -44,7 +45,7 @@ namespace Api.Controllers
         {
             try
             {
-                var response = await _postService.GetAllPostsAsync();
+                var response = await _postService.GetPostsFromPublicProfilesAsync();
                 string message = "List post";
                 return Ok(new { message, response });
             }

@@ -1,10 +1,8 @@
 ﻿using Api.Entity;
 using Api.Model.DTO;
 using Api.Service;
-using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
@@ -15,8 +13,7 @@ namespace Api.Controllers
         private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
 
-
-        public UserController(IUserService userService, ILogger<UserController> logger) 
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
             _userService = userService;
             _logger = logger;
@@ -69,7 +66,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login( LoginUserDTO user)
+        public async Task<ActionResult<string>> Login(LoginUserDTO user)
         {
             try
             {
@@ -88,7 +85,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("register")]
-        public async Task<ActionResult<List<Post>>> Register( User user)
+        public async Task<ActionResult<List<Post>>> Register(User user)
         {
             try
             {
@@ -102,26 +99,30 @@ namespace Api.Controllers
             }
         }
 
-            /// <summary>
-            /// update user
-            /// </summary>
-            /// <returns></returns>
-            [HttpPut("update-user")]
-            [Authorize()]
-
-            public async Task<ActionResult<string>> UpdateUser(bool profilePrivacy)
+        /// <summary>
+        /// update user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("update-user/{userId}")]
+        public async Task<ActionResult<string>> UpdateUser([FromBody] UpdateUserRequest request, int userId)
+        {
+            try
             {
-                try
-                {
-                    var response = await _userService.UpdateUserAsync(profilePrivacy);
-                    string message = "la modification du profil a réussi";
-                    return Ok(new { message, response });
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
+                var response = await _userService.UpdateUserAsync(request.ProfilePrivacy, userId);
+                string message = "La modification du profil a réussi";
+                return Ok(new { message, response });
             }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Classe pour recevoir la requête
+        public class UpdateUserRequest
+        {
+            public bool ProfilePrivacy { get; set; }
+        }
     }
-}
+  }
 

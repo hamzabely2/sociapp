@@ -16,3 +16,4 @@ public class Post
     public DateTime CreateDate { get; set; }
     public DateTime UpdateDate { get; set; }
 }
+ 

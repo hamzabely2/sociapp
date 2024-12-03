@@ -34,7 +34,6 @@ namespace Api.Service
 
             if (notifications == null || notifications.Count == 0)
             {
-                // Vous pouvez renvoyer une réponse indiquant qu'il n'y a pas de notifications
                 throw new ArgumentException("Aucune notification trouvée pour cet utilisateur.");
             }
 

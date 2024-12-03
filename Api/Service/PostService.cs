@@ -7,7 +7,7 @@ namespace Api.Services
 {
     public interface IPostService
     {
-        Task<List<Post>> GetAllPostsAsync();
+        Task<List<Post>> GetPostsFromPublicProfilesAsync();
         Task<Post> GetPostByIdAsync(int postId);
         Task<Post> CreatePostAsync(Post post);
         Task<Post> DeletePostAsync(int postId);
@@ -41,22 +41,36 @@ namespace Api.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<List<Post>> GetAllPostsAsync()
+        /// <summary>
+        /// Get posts created by users with public profiles.
+        /// </summary>
+        public async Task<List<Post>> GetPostsFromPublicProfilesAsync()
         {
             var userInfo = _connectionService.GetCurrentUserInfo();
 
-            if (userInfo.Id == 0)
+            if (_connectionService.GetCurrentUserInfo().Id == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
             var followedUserIds = await _context.Follows
-                .Where(f => f.UserId == userInfo.Id) 
-                .Select(f => f.FollowUserId)
-                .ToListAsync();
+                                                .Where(follow => follow.UserId == _connectionService.GetCurrentUserInfo().Id)
+                                                .Select(follow => follow.FollowUserId)
+                                                .ToListAsync();
+
+            if (!followedUserIds.Any())
+                return new List<Post>(); 
+
+            var publicFollowedUserIds = await _context.Users
+                                                      .Where(user => !user.ProfilePrivacy && followedUserIds.Contains(user.Id))
+                                                      .Select(user => user.Id)
+                                                      .ToListAsync();
+
+            if (!publicFollowedUserIds.Any())
+                return new List<Post>(); 
 
             var posts = await _context.Posts
-                .Where(p => followedUserIds.Contains(p.UserId)
-                            && !_context.Users.Any(u => u.Id == p.UserId && u.ProfilePrivacy))
-                .ToListAsync();
+                                       .Where(post => publicFollowedUserIds.Contains(post.UserId))
+                                       .OrderByDescending(post => post.CreateDate)
+                                       .ToListAsync();
 
             return posts;
         }

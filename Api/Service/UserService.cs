@@ -10,7 +10,7 @@ namespace Api.Service
     {
         Task<string> RegisterAsync(User user);
         Task<string> LoginAsync(LoginUserDTO user);
-        Task<string> UpdateUserAsync(bool profilePrivacy);
+        Task<string> UpdateUserAsync(bool profilePrivacy, int userId);
         Task<List<User>> GetAllUsersAsync();
         Task<User> GetUserAsync();
     }
@@ -110,9 +110,9 @@ namespace Api.Service
         /// <param name="profilePrivacy"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<string> UpdateUserAsync(bool profilePrivacy)
+        public async Task<string> UpdateUserAsync(bool profilePrivacy,int userId)
         {
-            var userInfo = _connectionService.GetCurrentUserInfo();
+            User userInfo = await _context.Users.FindAsync(userId);
             if (userInfo.Id == 0)
                 throw new ArgumentException("L'action a échoué : l'utilisateur n'existe pas");
 
