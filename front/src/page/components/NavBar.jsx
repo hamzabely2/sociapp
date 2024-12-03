@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Disclosure, Menu, Dialog } from "@headlessui/react";
+import { Disclosure, Menu, Dialog, Switch } from "@headlessui/react";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchNotifications, deleteNotification } from "../../service/notificationService";
-import { getUser, updateUserProfile } from '../../service/userService'; 
+import { getUser, updateUserProfile } from "../../service/userService";
+
 const navigation = [
   { name: "Post", href: "/", current: true },
   { name: "Utilisateur", href: "/user", current: false },
@@ -23,15 +24,15 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);  
-  const [isProfilePrivate, setIsProfilePrivate] = useState(false); 
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isProfilePrivate, setIsProfilePrivate] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await getUser(); 
+        const data = await getUser();
         setUser(data.data.response);
-        setIsProfilePrivate(data.data.response.isProfilePrivate);
+        setIsProfilePrivate(data.data.response.profilePrivacy);
       } catch (error) {
         toast.error("Erreur lors de la récupération de l'utilisateur.");
       }
@@ -48,8 +49,8 @@ export default function NavBar() {
 
   const loadNotifications = async () => {
     try {
-      const data = await fetchNotifications(); 
-      setNotifications(data.data.response);
+      const data = await fetchNotifications();
+      setNotifications(data.data.response.profilePrivacy);
     } catch (error) {
       toast.error(error.message);
     }
@@ -57,7 +58,7 @@ export default function NavBar() {
 
   const handleDeleteNotification = async (id) => {
     try {
-      await deleteNotification(id); 
+      await deleteNotification(id);
       toast.success("Notification supprimée !");
       setNotifications((prev) =>
         prev.filter((notification) => notification.id !== id)
@@ -67,9 +68,10 @@ export default function NavBar() {
     }
   };
 
-  const handleSaveSettings = async () => {
+  const handleSaveSettings = async (e) => {
+    console.log(user)
     try {
-      await updateUserProfile(isProfilePrivate );
+      await updateUserProfile(isProfilePrivate,user.id);
       toast.success("Paramètres enregistrés !");
       setIsSettingsModalOpen(false);
     } catch (error) {
@@ -146,7 +148,7 @@ export default function NavBar() {
                         <Menu.Item>
                           {({ active }) => (
                             <button
-                              onClick={() => setIsSettingsModalOpen(true)} // Ouvre le modal des paramètres
+                              onClick={() => setIsSettingsModalOpen(true)}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
@@ -232,22 +234,30 @@ export default function NavBar() {
             <div className="mt-4">
               <div className="flex items-center justify-between">
                 <p>Profil privé</p>
-                <input
-                  type="checkbox"
+                <Switch
                   checked={isProfilePrivate}
-                  onChange={() => setIsProfilePrivate(!isProfilePrivate)} // Changer l'état du profil privé
-                  className="h-5 w-5"
-                />
+                  onChange={setIsProfilePrivate}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isProfilePrivate ? "bg-indigo-600" : "bg-gray-200"
+                  }`}
+                >
+                  <span className="sr-only">Utiliser un profil privé</span>
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                      isProfilePrivate ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </Switch>
               </div>
             </div>
             <button
-              onClick={handleSaveSettings} // Enregistrer les paramètres
+              onClick={handleSaveSettings}
               className="mt-4 w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
               Sauvegarder
             </button>
             <button
-              onClick={() => setIsSettingsModalOpen(false)} // Fermer le modal
+              onClick={() => setIsSettingsModalOpen(false)}
               className="mt-2 w-full inline-flex justify-center rounded-md bg-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-400"
             >
               Annuler
