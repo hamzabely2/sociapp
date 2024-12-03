@@ -80,7 +80,6 @@ namespace Api.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        /// sauf si les utlise est en mod eprive ne montre pas ses postes
         public async Task<List<Post>> GetAllPostsUserAsync()
         {
             var userInfo = _connectionService.GetCurrentUserInfo();

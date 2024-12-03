@@ -21,7 +21,6 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get-all-user-posts")]
-        [Authorize()]
         public async Task<ActionResult<List<Post>>> GetAllPostsUser()
         {
             try

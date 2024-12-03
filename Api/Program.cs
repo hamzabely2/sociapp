@@ -58,6 +58,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 var reactApp = builder.Configuration["Cors:Url"];
+builder.Services.AddApplicationInsightsTelemetry();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(

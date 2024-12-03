@@ -1,6 +1,7 @@
 ﻿using Api.Entity;
 using Api.Model.DTO;
 using Api.Service;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,13 @@ namespace Api.Controllers
     {
         private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
+        private readonly TelemetryClient _telemetryClient;
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger, TelemetryClient telemetryClient)
         {
             _userService = userService;
             _logger = logger;
+            _telemetryClient = telemetryClient;
         }
 
         /// <summary>
@@ -45,9 +48,11 @@ namespace Api.Controllers
         [HttpGet("get-all-users")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
-            _logger.LogInformation("{get-all-users} endpoint called.");
             try
             {
+                _telemetryClient.TrackEvent("ExampleEvent");
+                _logger.LogInformation("{get-all-users} endpoint called.");
+
                 var response = await _userService.GetAllUsersAsync();
                 _logger.LogDebug("Response received: {Response}", response);
                 string message = "list utilisateur";
@@ -118,7 +123,6 @@ namespace Api.Controllers
             }
         }
 
-        // Classe pour recevoir la requête
         public class UpdateUserRequest
         {
             public bool ProfilePrivacy { get; set; }
