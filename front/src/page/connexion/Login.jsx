@@ -86,7 +86,7 @@ export default function Login() {
           </div>
           <div>
             <Link to="/register">
-            <p className='mb-2text-indigo-500'>inscrivez-vous maintenant</p>
+            <p className='mb-2 text-indigo-500'>inscrivez-vous maintenant</p>
             </Link>
             <button
               type="submit"
