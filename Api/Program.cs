@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,36 @@ builder.Services.AddCors(options =>
         "ReactLocal",
         policy => policy.WithOrigins(reactApp).AllowAnyHeader().AllowAnyMethod()
     );
+});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    // Configuration de Swagger pour inclure le champ "Authorize"
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+{
+    Name = "Authorization",
+    Type = SecuritySchemeType.ApiKey,
+    Scheme = "Bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "Entrez le token JWT dans le champ suivant : Bearer <votre_token>"
+});
+
+// Ajouter un filtre pour que chaque requête nécessite l'authentification
+options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
 });
 
 var app = builder.Build();
