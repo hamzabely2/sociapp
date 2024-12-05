@@ -3,7 +3,6 @@ using Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Logging; 
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +44,7 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // Activer HTTPS en production
+    options.RequireHttpsMetadata = false; 
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,
