@@ -50,7 +50,7 @@ export default function NavBar() {
   const loadNotifications = async () => {
     try {
       const data = await fetchNotifications();
-      setNotifications(data.data.response.profilePrivacy);
+      setNotifications(data.data.response);
     } catch (error) {
       toast.error(error.message);
     }
